@@ -24,7 +24,9 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      - run: npm run test_circle
+      - run: |
+          npm run test_circle
+          bash <(curl -s https://codecov.io/bash)
 
       - store_test_results:
           path: ./junit.xml
