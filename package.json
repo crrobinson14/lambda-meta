@@ -17,8 +17,8 @@
   "homepage": "https://github.com/crrobinson14/lambda-meta#readme",
   "scripts": {
     "lint": "eslint --ext .js functions test lib migrations models",
-    "test": "cross-env NODE_ENV=test nyc --reporter=text-summary --reporter=html mocha",
-    "test_circle": "cross-env NODE_ENV=test node_modules/.bin/nyc --reporter=text-summary --reporter=html mocha test --reporter mocha-junit-reporter --reporter-options mochaFile=./junit.xml"
+    "test": "cross-env NODE_ENV=test nyc mocha",
+    "test_circle": "cross-env NODE_ENV=test node_modules/.bin/nyc mocha --reporter mocha-junit-reporter --reporter-options mochaFile=./junit.xml"
   },
   "nyc": {
     "include": [
@@ -30,6 +30,7 @@
       "node_modules"
     ],
     "reporter": [
+      "lcov",
       "html",
       "text-summary"
     ]
