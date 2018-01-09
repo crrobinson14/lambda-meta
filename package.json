@@ -10,7 +10,9 @@
     "type": "git",
     "url": "git+https://github.com/crrobinson14/lambda-meta.git"
   },
-  "author": "",
+  "author": {
+    "name": "Chad Robinson"
+  },
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/crrobinson14/lambda-meta/issues"

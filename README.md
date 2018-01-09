@@ -35,7 +35,7 @@ Usage is fairly simple. Install the module (`npm i -S lambda-meta`), then create
 
         entry: (event, context, callback) => lm.processRequest(module.exports, event, context, callback),
 
-        handler: (event, context) => {
+        process: (event, context) => {
             // Note that we can rely on context.params being defined and being an object. And context.params.userId will
             // be defined and be a string.
             console.log('Got a request for user ' + context.params.userId, event);
