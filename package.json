@@ -3,9 +3,6 @@
   "version": "0.3.0",
   "description": "AWS Lambda Metadata Handlers",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/crrobinson14/lambda-meta.git"
@@ -18,10 +15,36 @@
     "url": "https://github.com/crrobinson14/lambda-meta/issues"
   },
   "homepage": "https://github.com/crrobinson14/lambda-meta#readme",
+  "scripts": {
+    "lint": "eslint --ext .js functions test lib migrations models",
+    "test": "cross-env NODE_ENV=test nyc --reporter=text-summary --reporter=html mocha"
+  },
+  "nyc": {
+    "include": [
+      "index.js"
+    ],
+    "exclude": [
+      "test",
+      "examples",
+      "node_modules"
+    ],
+    "reporter": [
+      "html",
+      "text-summary"
+    ]
+  },
   "dependencies": {
     "aws-xray-sdk-core": "^1.1.6",
     "lodash": "^4.17.4",
     "type-check": "^0.3.2",
     "uuid": "^3.1.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "cross-env": "^5.1.3",
+    "dirty-chai": "^2.0.1",
+    "lambda-wrapper": "^0.2.2",
+    "mocha": "^4.1.0",
+    "nyc": "^11.4.1"
   }
 }

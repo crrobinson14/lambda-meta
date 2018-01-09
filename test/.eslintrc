@@ -1,0 +1,20 @@
+{
+    "globals": {
+        "axios": true,
+        "before": true,
+        "after": true,
+        "expect": true,
+        "beforeEach": true,
+        "afterEach": true,
+        "bootstrap": true,
+        "assert": true,
+        "describe": true,
+        "it": true,
+        "api": true
+    },
+    "rules": {
+        "array-callback-return": "off",
+        "new-cap": "off",
+        "consistent-return": "off"
+    }
+}

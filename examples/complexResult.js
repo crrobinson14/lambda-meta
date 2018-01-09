@@ -1,8 +1,8 @@
-const lm = require('lambda-meta');
+const lm = require('../index');
 
 module.exports = {
-    name: 'noParameters',
-    description: 'Sample method that uses no parameters.',
+    name: 'complexResult',
+    description: 'Sample method that uses no parameters and returns a complex object result.',
 
     entry: (event, context, callback) => lm.processRequest(module.exports, event, context, callback),
 

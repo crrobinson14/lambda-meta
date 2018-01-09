@@ -8,6 +8,7 @@ const isTest = process.env.NODE_ENV === 'test';
 AWSXRay.enableManualMode();
 
 class LambdaEvent {
+    /* istanbul ignore next */
     constructor() {
         this.queryStringParameters = {};
         this.pathParameters = {};
@@ -16,6 +17,7 @@ class LambdaEvent {
 }
 
 class LambdaModule {
+    /* istanbul ignore next */
     constructor() {
         this.name = 'Test';
         this.inputs = 'Test';
@@ -25,6 +27,8 @@ class LambdaModule {
 }
 
 module.exports = {
+    noLogParams: ['password'],
+
     /**
      * Wrapper for processing requests.
      * @param {LambdaModule} module - The module being processed. Must contain a `name` field.
@@ -48,7 +52,10 @@ module.exports = {
             context.awsRequestId = uuidv4();
         }
 
-        console.log((module.name || 'Unknown') + '(): Processing request ' + (context.awsRequestId || ''));
+        /* istanbul ignore next */
+        if (!isTest) {
+            console.log((module.name || 'Unknown') + '(): Processing request ' + (context.awsRequestId || ''));
+        }
 
         return this.parseParameters(module, event, context)
             .then(() => this.validateParameters(module, event, context))
@@ -78,14 +85,27 @@ module.exports = {
     parseParameters(module, event, context) {
         context.params = {};
 
+        this.parseRawEvent(context, event);
         this.parsePathParameters(context, event);
         this.parseQueryString(context, event);
         this.parseBody(context, event);
 
-        console.log('Parsed parameters', _.omit(context.params, ['password', 'idToken', 'accessToken']));
+        /* istanbul ignore next */
+        if (!isTest) {
+            console.log('Parsed parameters', _.omit(context.params, this.noLogParams));
+        }
 
         // For future expansion, we made this promise-based.
         return Promise.resolve(true);
+    },
+
+    // HTTP calls (may) get a query string with decoded parameters
+    parseRawEvent(context, event) {
+        if (Object.prototype.toString.call(event) === '[object Object]' &&
+            !_.has(event, 'queryStringParameters') &&
+            !_.has(event, 'pathParameters')) {
+            Object.assign(context.params, event);
+        }
     },
 
     // HTTP calls (may) get a query string with decoded parameters
@@ -113,11 +133,6 @@ module.exports = {
         }
     },
 
-    validateParameter(fieldName, field, event, context) {
-        return Promise.resolve(field.validate(event, context))
-            .then(result => ((result === true) ? true : Promise.reject(new Error('Invalid ' + fieldName))));
-    },
-
     validateParameters(module, event, context) {
         // First, sanitize unwanted inputs
         const inputFields = Object.keys(module.inputs || {});
@@ -135,13 +150,18 @@ module.exports = {
             // The remaining checks apply only if the input was provided.
             if (fieldName in context.params) {
                 // If the field type is specified, check for it directly
-                if (field.type && TypeCheck(field.type, context.params[fieldName])) {
-                    return Promise.reject(new Error('Invalid field, "' + fieldName + '" must be "' + field.type) + '"');
+                if (field.type && !TypeCheck(field.type, context.params[fieldName])) {
+                    return Promise.reject(new Error('Invalid "' + fieldName + '", must be of type "' +
+                        field.type + '"'));
                 }
 
-                // If a validator is specified, call it
+                // If a validator is specified, call it in a Promise context
                 if (_.isFunction(field.validate)) {
-                    return this.validateParameter(fieldName, field, event, context);
+                    return Promise.resolve(field.validate(event, context)).then(r => {
+                        if (r !== true) {
+                            throw new Error('Invalid ' + fieldName);
+                        }
+                    });
                 }
             }
 

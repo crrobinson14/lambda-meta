@@ -87,6 +87,11 @@ generic. Business logic related to the function itself should be in `process`:
 
     preprocess: mySessionLibrary.loadSession,
 
+Note that parameters are logged for debugging purposes, but `password` is automatically filtered for security reasons.
+To add additional parameters to be filtered/omitted from logging, set `noLogParams`:
+
+    lm.noLogParams = ['password', 'accessToken', 'bigBodyField'];
+
 ## Input Validation
 
 By default, all parameters are considered optional, and are parsed as provided by the caller. It is up to the function
@@ -119,7 +124,9 @@ metadata:
         },
     },
 
-Note that if input validation fails, the `preprocess` and `process` functions are not called.
+Note that if input validation fails, the `preprocess` and `process` functions are not called. Also, if inputs are
+defined, parameters are filtered by the field list. Inputs that are not defined are not carried through to the
+processing functions.
 
 ## Output Processing
 
@@ -157,3 +164,4 @@ example, `process(event, context) => (new Error('It failed!'))` would output:
 2. We need to get some tests into the project. The thing is, testing requires a local Lambda emulator. The author is
  using the [Serverless](serverless.com) framework for his projects, but "SAM Local" is probably a better choice for
  testing an NPM like this. This was left for phase-2 to address.
+3. Move `noLogParams` to an option field (e.g. `filterFromLogs: true`) per input field.

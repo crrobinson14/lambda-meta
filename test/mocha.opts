@@ -1,0 +1,7 @@
+--recursive
+--reporter spec
+--timeout 10000
+--ignore-leaks
+--slow 2000
+--globals expect
+test/*.js
