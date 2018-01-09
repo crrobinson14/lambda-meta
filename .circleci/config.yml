@@ -24,18 +24,13 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      # run tests!
-      - run:
-          command: npm run test_circle
-          environment:
-              MOCHA_FILE: junit/test-results.xml
-          when: always
+      - run: npm run test_circle
 
       - store_test_results:
-          path: ~/junit
+          path: ./junit.xml
 
       - store_artifacts:
-          path: ~/junit
+          path: ./junit.xml
 
       - store_artifacts:
-          path: ~/coverage
+          path: ./coverage
