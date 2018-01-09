@@ -1,5 +1,7 @@
 # Lambda Meta Handlers
 
+[![CircleCI](https://circleci.com/gh/crrobinson14/lambda-meta.svg?style=shield)](https://circleci.com/gh/crrobinson14/lambda-meta)
+
 This project provides some simple, mildly-opinionated wrappers for AWS Lambda request processing. Specifically:
 
 1. Parsing parameters in Lambda requires manual work and attention to where the parameters are coming in (e.g. query
