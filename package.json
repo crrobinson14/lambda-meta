@@ -1,0 +1,24 @@
+{
+  "name": "lambda-meta",
+  "version": "0.1.0",
+  "description": "AWS Lambda Metadata Handlers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crrobinson14/lambda-meta.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/crrobinson14/lambda-meta/issues"
+  },
+  "homepage": "https://github.com/crrobinson14/lambda-meta#readme",
+  "dependencies": {
+    "aws-xray-sdk-core": "^1.1.6",
+    "lodash": "^4.17.4",
+    "uuid": "^3.1.0"
+  }
+}
