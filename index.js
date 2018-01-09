@@ -84,7 +84,9 @@ module.exports = {
      */
     parseParameters(module, event, context) {
         context.params = {};
+        context.headers = {};
 
+        this.parseHeaders(context, event);
         this.parseRawEvent(context, event);
         this.parsePathParameters(context, event);
         this.parseQueryString(context, event);
@@ -97,6 +99,13 @@ module.exports = {
 
         // For future expansion, we made this promise-based.
         return Promise.resolve(true);
+    },
+
+    // HTTP headers, if present, are just carried through. It's up to the (pre)processor to use them.
+    parseHeaders(context, event) {
+        if (_.has(event, 'headers')) {
+            Object.assign(context.headers, event.headers);
+        }
     },
 
     // HTTP calls (may) get a query string with decoded parameters
