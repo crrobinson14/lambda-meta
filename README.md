@@ -1,6 +1,7 @@
 # Lambda Meta Handlers
 
 [![CircleCI](https://circleci.com/gh/crrobinson14/lambda-meta.svg?style=shield)](https://circleci.com/gh/crrobinson14/lambda-meta)
+[![codecov](https://codecov.io/gh/crrobinson14/lambda-meta/branch/master/graph/badge.svg)](https://codecov.io/gh/crrobinson14/lambda-meta)
 
 This project provides some simple, mildly-opinionated wrappers for AWS Lambda request processing. Specifically:
 
