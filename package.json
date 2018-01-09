@@ -21,7 +21,7 @@
   "dependencies": {
     "aws-xray-sdk-core": "^1.1.6",
     "lodash": "^4.17.4",
-    "type-of-is": "^3.5.1",
+    "type-check": "^0.3.2",
     "uuid": "^3.1.0"
   }
 }

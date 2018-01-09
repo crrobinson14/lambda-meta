@@ -29,7 +29,7 @@ Usage is fairly simple. Install the module (`npm i -S lambda-meta`), then create
                 required: true,
                 type: 'String',
                 description: 'String user ID to retrieve.',
-                validate: (event, context) => typeof context.params.userId === 'string'
+                validate: (event, context) => context.params.userId.length === 36
             },
         },
 
@@ -98,8 +98,8 @@ metadata:
             // If defined as true, an error will be thrown if the input is not present
             required: true,
 
-            // The Javascript type, as returned by "Type-Of-Is", the input value must be. If omitted, this check is
-            // skipped. See https://github.com/stephenhandley/type-of-is for a list of available types.
+            // The Javascript type (as returned by "Type-Check") the input value must be. If omitted, this check is
+            // skipped. See https://www.npmjs.com/package/type-check for a list of available types.
             type: 'String',
 
             // Optional, but recommended for documentation generators. Ignored by this module.
@@ -151,7 +151,7 @@ example, `process(event, context) => (new Error('It failed!'))` would output:
 
 ## TODO
 
-1. This module depends on `aws-xray-sdk-core`, `lodash`, 'type-of-is', and `uuid`. At some point we will probably move
+1. This module depends on `aws-xray-sdk-core`, `lodash`, `type-check`, and `uuid`. At some point we will probably move
  these to be peer dependencies but the author's projects all required these modules anyway so this was left "simple"
  for now. Feel free to submit a PR to change this. :)
 2. We need to get some tests into the project. The thing is, testing requires a local Lambda emulator. The author is

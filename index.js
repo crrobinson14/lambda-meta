@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const uuidv4 = require('uuid/v4');
 const AWSXRay = require('aws-xray-sdk-core');
-const Type = require('type-of-is');
+const TypeCheck = require('type-check').typeCheck;
 
 const isTest = process.env.NODE_ENV === 'test';
 
@@ -135,7 +135,7 @@ module.exports = {
             // The remaining checks apply only if the input was provided.
             if (fieldName in context.params) {
                 // If the field type is specified, check for it directly
-                if (field.type && Type.is(context.params[fieldName], field.type)) {
+                if (field.type && TypeCheck(field.type, context.params[fieldName])) {
                     return Promise.reject(new Error('Invalid field, "' + fieldName + '" must be "' + field.type) + '"');
                 }
 
