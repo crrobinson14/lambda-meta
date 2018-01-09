@@ -7,7 +7,7 @@ module.exports = {
     inputs: {
         userId: {
             required: true,
-            type: 'string',
+            type: 'String',
             description: 'String user ID to retrieve.',
             validate: (event, context) => context.params.userId.length === 36
         },

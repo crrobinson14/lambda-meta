@@ -27,7 +27,7 @@ Usage is fairly simple. Install the module (`npm i -S lambda-meta`), then create
         inputs: {
             userId: {
                 required: true,
-                type: 'string',
+                type: 'String',
                 description: 'String user ID to retrieve.',
                 validate: (event, context) => typeof context.params.userId === 'string'
             },
@@ -98,8 +98,9 @@ metadata:
             // If defined as true, an error will be thrown if the input is not present
             required: true,
 
-            // The Javascript type, as returned by "typeof", the input value must be. If omitted, this check is skipped.
-            type: 'string',
+            // The Javascript type, as returned by "Type-Of-Is", the input value must be. If omitted, this check is
+            // skipped. See https://github.com/stephenhandley/type-of-is for a list of available types.
+            type: 'String',
 
             // Optional, but recommended for documentation generators. Ignored by this module.
             description: 'String user ID to retrieve.',
@@ -150,9 +151,9 @@ example, `process(event, context) => (new Error('It failed!'))` would output:
 
 ## TODO
 
-1. This module depends on `aws-xray-sdk-core`, `lodash`, and `uuid`. At some point we will probably move these to
- be peer dependencies but the author's projects all required these modules anyway so this was left "simple" for now.
- Feel free to submit a PR to change this. :)
+1. This module depends on `aws-xray-sdk-core`, `lodash`, 'type-of-is', and `uuid`. At some point we will probably move
+ these to be peer dependencies but the author's projects all required these modules anyway so this was left "simple"
+ for now. Feel free to submit a PR to change this. :)
 2. We need to get some tests into the project. The thing is, testing requires a local Lambda emulator. The author is
  using the [Serverless](serverless.com) framework for his projects, but "SAM Local" is probably a better choice for
  testing an NPM like this. This was left for phase-2 to address.
