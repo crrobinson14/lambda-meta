@@ -104,7 +104,7 @@ module.exports = {
     // HTTP headers, if present, are just carried through. It's up to the (pre)processor to use them.
     parseHeaders(context, event) {
         if (_.has(event, 'headers')) {
-            Object.assign(context.headers, event.headers);
+            context.headers = _.mapKeys(event.headers, (v, k) => k.toLowerCase());
         }
     },
 
