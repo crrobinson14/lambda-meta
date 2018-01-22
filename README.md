@@ -159,6 +159,14 @@ example, `process(event, context) => (new Error('It failed!'))` would output:
         error: 'It failed!'
     }
 
+## NOTES
+
+1. Be careful with parameter validation for URL parameters in GET requests. In Lambda, all of these arrive as strings.
+Lambda-Meta includes a special case handler if your requested type is 'Number': an incoming string will be checked to
+see if it can be converted to a Number, and if so, this will be done silently. But this is just a helper for the most
+common use-case. Complex types supported by Type-Check like arrays and objects are not supported. If you need to use
+these, it is strongly recommend that you use non-URL parameters (typically body parameters via POST/etc).
+
 ## TODO
 
 1. This module depends on `aws-xray-sdk-core`, `lodash`, `type-check`, and `uuid`. At some point we will probably move

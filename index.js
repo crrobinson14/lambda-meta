@@ -158,6 +158,15 @@ module.exports = {
 
             // The remaining checks apply only if the input was provided.
             if (fieldName in context.params) {
+                // Special case check for numbers arriving as strings. We get these from Lambda in GET request from
+                // the URL processing - EVERYTHING is a string.
+                // eslint-disable-line eqeqeq
+                if (field.type === 'Number' &&
+                    !isNaN(context.params[fieldName]) &&
+                    parseInt(context.params[fieldName], 10) == context.params[fieldName]) {
+                    context.params[fieldName] = parseInt(context.params[fieldName], 10);
+                }
+
                 // If the field type is specified, check for it directly
                 if (field.type && !TypeCheck(field.type, context.params[fieldName])) {
                     return Promise.reject(new Error('Invalid "' + fieldName + '", must be of type "' +
