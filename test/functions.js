@@ -12,6 +12,10 @@ const complexResult = wrapHandler('complexResult');
 const preprocessor = wrapHandler('preprocessor');
 const useParameters = wrapHandler('useParameters');
 const throwError = wrapHandler('throwError');
+const numericInput = wrapHandler('numericInput');
+const headers = wrapHandler('headers');
+
+const validUserId = '6576BCA5-946B-41AC-AC91-E4096E95E3CD';
 
 describe('Output Handling', () => {
     it('should tolerate functions with no names', () => noName.run({}).then(data => {
@@ -58,14 +62,6 @@ describe('Output Handling', () => {
         expect(response.error).to.equal('Missing required field userId');
     }));
 
-    it('should check for required inputs properly', () => useParameters.run({ userId: 1 }).then(data => {
-        expect(data.statusCode).to.equal(500);
-
-        const response = JSON.parse(data.body);
-        expect(response.status).to.equal('ERROR');
-        expect(response.error).to.equal('Invalid "userId", must be of type "String"');
-    }));
-
     it('should call validator functions properly', () => useParameters.run({ userId: "a" }).then(data => {
         expect(data.statusCode).to.equal(500);
 
@@ -74,10 +70,73 @@ describe('Output Handling', () => {
         expect(response.error).to.equal('Invalid userId');
     }));
 
+    it('should parse string JSON blocks', () => useParameters.run(`{ "userId": "${validUserId}" }`).then(data => {
+        expect(data.statusCode).to.equal(200);
+
+        const response = JSON.parse(data.body);
+        expect(response.userIdRequested).to.equal(validUserId);
+    }));
+
+    it('should parse string bodies', () => useParameters.run({ body: `{ "userId": "${validUserId}" }` }).then(data => {
+        expect(data.statusCode).to.equal(200);
+
+        const response = JSON.parse(data.body);
+        expect(response.userIdRequested).to.equal(validUserId);
+    }));
+
+    it('should parse query headers', () => headers.run({ headers: { 'Authorization': 'Bearer XYZ' } }).then(data => {
+        expect(data.statusCode).to.equal(200);
+
+        const response = JSON.parse(data.body);
+        expect(response.headers.authorization).to.equal('Bearer XYZ');
+    }));
+
+    it('should parse query strings', () => useParameters.run({
+        queryStringParameters: { userId: validUserId }
+    }).then(data => {
+        expect(data.statusCode).to.equal(200);
+
+        const response = JSON.parse(data.body);
+        expect(response.userIdRequested).to.equal(validUserId);
+    }));
+
+    it('should parse path parameters', () => useParameters.run({
+        pathParameters: { userId: validUserId }
+    }).then(data => {
+        expect(data.statusCode).to.equal(200);
+
+        const response = JSON.parse(data.body);
+        expect(response.userIdRequested).to.equal(validUserId);
+    }));
+
+    it('should handle numeric input checking', () => numericInput.run({ num: 1 }).then(data => {
+        expect(data.statusCode).to.equal(200);
+
+        const response = JSON.parse(data.body);
+        expect(response.num).to.equal(1);
+    }));
+
+    it('should handle "string" numbers (query/path params)', () => numericInput.run({ num: '1' }).then(data => {
+        expect(data.statusCode).to.equal(200);
+
+        const response = JSON.parse(data.body);
+        expect(response.num).to.equal(1);
+    }));
+
+    it('should block true strings -> numbers', () => numericInput.run({ num: 'a' }).then(data => {
+        expect(data.statusCode).to.equal(500);
+
+        const response = JSON.parse(data.body);
+        expect(response.error).to.equal('Invalid "num", must be of type "Number"');
+    }));
+
     it('should call validator functions properly', () => useParameters.run({
-        userId: "6576BCA5-946B-41AC-AC91-E4096E95E3CD",
+        userId: validUserId,
         fieldWithBogusValidator: 'abc',
     }).then(data => {
         expect(data.statusCode).to.equal(200);
+
+        const response = JSON.parse(data.body);
+        expect(response.userIdRequested).to.equal(validUserId);
     }));
 });

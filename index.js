@@ -110,10 +110,18 @@ module.exports = {
 
     // HTTP calls (may) get a query string with decoded parameters
     parseRawEvent(context, event) {
-        if (Object.prototype.toString.call(event) === '[object Object]' &&
-            !_.has(event, 'queryStringParameters') &&
-            !_.has(event, 'pathParameters')) {
+        // Direct calls include the params in the "event" as a string
+        if (_.isPlainObject(event) && !_.has(event, 'queryStringParameters') && !_.has(event, 'pathParameters')) {
             Object.assign(context.params, event);
+        }
+
+        // Data can also arrive as a string in some circumstances, but it may be a JSON string. Decode if we can.
+        if (_.isString(event) && event[0] === '{') {
+            try {
+                Object.assign(context.params, JSON.parse(event));
+            } catch (e) {
+                // NOP
+            }
         }
     },
 
@@ -133,7 +141,7 @@ module.exports = {
 
     // POST HTTP calls (may) get a body with decoded parameters
     parseBody(context, event) {
-        if (_.has(event, 'body')) {
+        if (_.isString(event.body) && event.body[0] === '{') {
             try {
                 Object.assign(context.params, JSON.parse(event.body));
             } catch (e) {
@@ -143,9 +151,11 @@ module.exports = {
     },
 
     validateParameters(module, event, context) {
-        // First, sanitize unwanted inputs
+        // First, sanitize unwanted inputs, but only if inputs were specified
         const inputFields = Object.keys(module.inputs || {});
-        context.params = _.pick(context.params, inputFields);
+        if (inputFields.length > 0) {
+            context.params = _.pick(context.params, inputFields);
+        }
 
         // Now validate each one
         const promises = inputFields.map(fieldName => {
