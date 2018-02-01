@@ -159,6 +159,21 @@ example, `process(event, context) => (new Error('It failed!'))` would output:
         error: 'It failed!'
     }
 
+## Function Discovery
+
+Lambda-Meta exports a function that may be useful within `serverless.com` environments. If called during a build process
+it can be used to build a definition of known functions based on their metadata:
+
+```
+// serverless.js:
+const lm = require('lambda-meta);
+module.exports = {
+    service: 'xyz',
+    // ...
+    functions: lm.enumerateFunctions('functions/**/*.js'),
+};
+```
+
 ## NOTES
 
 1. Be careful with parameter validation for URL parameters in GET requests. In Lambda, all of these arrive as strings.

@@ -1,4 +1,6 @@
 const _ = require('lodash');
+const path = require('path');
+const glob = require('glob');
 const uuidv4 = require('uuid/v4');
 const AWSXRay = require('aws-xray-sdk-core');
 const TypeCheck = require('type-check').typeCheck;
@@ -240,5 +242,58 @@ module.exports = {
             statusCode: 200,
             body: JSON.stringify(body),
         });
-    }
+    },
+
+    /**
+     * Enumerate the functions defined in a given subdirectory and returned a formatted dictionary of metadata for the
+     * functions found. The format returned is suitable for exporting from a `serverless.js` file, but may be useful
+     * for other operations (e.g. documentation generation) as well.
+     *
+     * @param {String} subdir - The wildcard path to scan, e.g. "functions/** /*.js"
+     * @returns {Object}
+     */
+    enumerateFunctions(subdir) {
+        const functions = {};
+        const files = glob.sync(path.join(__dirname, subdir), { nodir: true });
+
+        files.map(file => {
+            // eslint-disable-next-line import/no-dynamic-require
+            const fn = require(file);
+
+            const functionDef = {
+                handler: path.relative('.', file).replace('.js', '.entry'),
+                events: [],
+            };
+
+            if (fn.timeout) {
+                functionDef.timeout = fn.timeout;
+            }
+
+            if (fn.memorySize) {
+                functionDef.memorySize = fn.memorySize;
+            }
+
+            if (fn.apiGateway) {
+                functionDef.events = functionDef.events || [];
+                functionDef.events.push({
+                    http: {
+                        path: fn.apiGateway.path,
+                        method: fn.apiGateway.method,
+                        cors: true,
+                    }
+                });
+            }
+
+            if (fn.schedule) {
+                functionDef.events = functionDef.events || [];
+                functionDef.events.push({
+                    schedule: fn.schedule
+                });
+            }
+
+            functions[fn.name] = functionDef;
+        });
+
+        return functions;
+    },
 };

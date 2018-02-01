@@ -3,6 +3,9 @@ const lm = require('../index');
 module.exports = {
     name: 'throwError',
     description: 'Illustrates error handling.',
+    schedule: 'cron(*/5 * * * ? *)',
+    timeout: 30,
+    memorySize: 256,
 
     entry: (event, context, callback) => lm.processRequest(module.exports, event, context, callback),
 
