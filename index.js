@@ -254,7 +254,7 @@ module.exports = {
      */
     enumerateFunctions(subdir) {
         const functions = {};
-        const files = glob.sync(path.join(__dirname, subdir), { nodir: true });
+        const files = glob.sync(path.join(process.cwd(), subdir), { nodir: true });
 
         files.map(file => {
             // eslint-disable-next-line import/no-dynamic-require
