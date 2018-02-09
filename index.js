@@ -2,12 +2,9 @@ const _ = require('lodash');
 const path = require('path');
 const glob = require('glob');
 const uuidv4 = require('uuid/v4');
-const AWSXRay = require('aws-xray-sdk-core');
 const TypeCheck = require('type-check').typeCheck;
 
 const isTest = process.env.NODE_ENV === 'test';
-
-AWSXRay.enableManualMode();
 
 class LambdaEvent {
     /* istanbul ignore next */
@@ -42,8 +39,6 @@ module.exports = {
     processRequest(module, event, context, callback) {
         context.callbackWaitsForEmptyEventLoop = false;
 
-        const segment = new AWSXRay.Segment(module.name || 'Unknown');
-
         /* istanbul ignore next */
         if (Object.prototype.toString.call(context) !== '[object Object]') {
             context = {};
@@ -63,14 +58,8 @@ module.exports = {
             .then(() => this.validateParameters(module, event, context))
             .then(() => module.preprocess ? module.preprocess(event, context) : true)
             .then(() => module.process(event, context))
-            .then(result => {
-                segment.close();
-                this.respondWithSuccess(callback, result);
-            })
-            .catch(e => {
-                segment.close(e);
-                this.respondWithError(callback, e);
-            });
+            .then(result => this.respondWithSuccess(callback, result))
+            .catch(e => this.respondWithError(callback, e));
     },
 
     /**
