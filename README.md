@@ -15,8 +15,6 @@ check each field. Validators are Promise-based and may thus be asynchronous (e.g
 
 3. Output handling is standardized and set both the HTTP status code and output format for each response.
 
-4. AWS Xray segments are defined and processed for each handler.
-
 ## Usage
 
 Usage is fairly simple. Install the module (`npm i -S lambda-meta`), then create each handler file as follows:
@@ -56,8 +54,8 @@ Breaking down what is happening above:
 
 Each handler is organized into a NodeJS module. This mimics what is already done for Lambda functions today, but
 additional metadata fields are exported for Lambda Metadata to process. The `name` field is required for proper
-logging and Xray handling (although cases where it is missing are tolerated). `description` is optional but recommended,
-and helpful for other tasks like generating API documentation.
+logging (although cases where it is missing are tolerated). `description` is optional but recommended, and helpful for
+other tasks like generating API documentation.
 
 Next, one boilerplate line is added:
 
@@ -184,9 +182,9 @@ these, it is strongly recommend that you use non-URL parameters (typically body 
 
 ## TODO
 
-1. This module depends on `aws-xray-sdk-core`, `lodash`, `type-check`, and `uuid`. At some point we will probably move
- these to be peer dependencies but the author's projects all required these modules anyway so this was left "simple"
- for now. Feel free to submit a PR to change this. :)
+1. This module depends on `lodash`, `type-check`, and `uuid`. At some point we will probably move these to be peer
+ dependencies but the author's projects all required these modules anyway so this was left "simple" for now. Feel free
+ to submit a PR to change this. :)
 2. We need to get some tests into the project. The thing is, testing requires a local Lambda emulator. The author is
  using the [Serverless](serverless.com) framework for his projects, but "SAM Local" is probably a better choice for
  testing an NPM like this. This was left for phase-2 to address.
