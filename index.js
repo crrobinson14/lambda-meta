@@ -1,5 +1,4 @@
 const _ = require('lodash');
-const _ = require('lodash');
 const path = require('path');
 const glob = require('glob');
 const uuidv4 = require('uuid/v4');
