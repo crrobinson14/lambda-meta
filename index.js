@@ -145,9 +145,11 @@ module.exports = {
     // Multipart form attachments
     // @credit https://github.com/myshenin/aws-lambda-multipart-parser for the basic technique and regexes
     parseMultipart(context, event) {
-        const boundary = (context.headers || {})['content-type'].split('=')[1];
+        const contentType = (context.headers || {})['content-type'] || 'text/plain';
+        const boundary = contentType.split('=')[1];
+        const body = event.body || '';
 
-        const parts = (event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString('binary') : event.body)
+        const parts = (event.isBase64Encoded ? Buffer.from(body, 'base64').toString('binary') : body)
             .split(new RegExp(boundary))
             .filter(item => item.match(/Content-Disposition/));
 
