@@ -82,6 +82,7 @@ module.exports = {
         this.parsePathParameters(context, event);
         this.parseQueryString(context, event);
         this.parseBody(context, event);
+        this.parseMultipart(context, event);
 
         /* istanbul ignore next */
         if (!isTest) {
@@ -139,6 +140,60 @@ module.exports = {
                 // NOP
             }
         }
+    },
+
+    // Multipart form attachments
+    // @credit https://github.com/myshenin/aws-lambda-multipart-parser for the basic technique and regexes
+    parseMultipart(context, event) {
+        const boundary = (context.headers || {})['content-type'].split('=')[1];
+
+        const parts = (event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString('binary') : event.body)
+            .split(new RegExp(boundary))
+            .filter(item => item.match(/Content-Disposition/));
+
+        parts.map(part => {
+            if (part.match(/filename/)) {
+                // File attachment
+                const name = part
+                    .match(/name="[a-zA-Z_]+([a-zA-Z0-9_]*)"/)[0]
+                    .split('=')[1]
+                    .match(/[a-zA-Z_]+([a-zA-Z0-9_]*)/)[0];
+
+                const filename = part
+                    .match(/filename="[\w-\. ]+"/)[0]
+                    .split('=')[1]
+                    .match(/[\w-\.]+/)[0];
+
+                const containsText = part
+                    .match(/Content-Type: .+\r\n\r\n/)[0]
+                    .replace(/Content-Type: /, '')
+                    .replace(/\r\n\r\n/, '')
+                    .match(/text/);
+
+                const content = containsText ? part
+                    .split(/\r\n\r\n/)[1]
+                    .replace(/\r\n\r\n\r\n----/, '') : Buffer.from(part
+                    .split(/\r\n\r\n/)[1]
+                    .replace(/\r\n\r\n\r\n----/, ''), 'binary');
+
+                const contentType = part
+                    .match(/Content-Type: .+\r\n\r\n/)[0]
+                    .replace(/Content-Type: /, '')
+                    .replace(/\r\n\r\n/, '');
+
+                context.attachments[name] = { filename, contentType, content };
+            } else {
+                // Text parameter attachment
+                const name = part
+                    .match(/name="[a-zA-Z_]+([a-zA-Z0-9_]*)"/)[0]
+                    .split('=')[1]
+                    .match(/[a-zA-Z_]+([a-zA-Z0-9_]*)/)[0];
+
+                context.params[name] = part
+                    .split(/\r\n\r\n/)[1]
+                    .split(/\r\n--/)[0];
+            }
+        });
     },
 
     validateParameters(module, event, context) {
