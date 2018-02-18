@@ -78,20 +78,19 @@ module.exports = {
         context.params = {};
         context.headers = {};
 
-        this.parseHeaders(context, event);
-        this.parseRawEvent(context, event);
-        this.parsePathParameters(context, event);
-        this.parseQueryString(context, event);
-        this.parseBody(context, event);
-        this.parseMultipart(context, event);
+        return this.parseHeaders(context, event)
+            .then(() => this.parseRawEvent(context, event))
+            .then(() => this.parsePathParameters(context, event))
+            .then(() => this.parseQueryString(context, event))
+            .then(() => this.parseBody(context, event))
+            .then(() => {
+                /* istanbul ignore next */
+                if (!isTest) {
+                    console.log('Parsed parameters', _.omit(context.params, this.noLogParams));
+                }
 
-        /* istanbul ignore next */
-        if (!isTest) {
-            console.log('Parsed parameters', _.omit(context.params, this.noLogParams));
-        }
-
-        // For future expansion, we made this promise-based.
-        return Promise.resolve(true);
+                return true;
+            });
     },
 
     // HTTP headers, if present, are just carried through. It's up to the (pre)processor to use them.
@@ -99,6 +98,8 @@ module.exports = {
         if (_.has(event, 'headers')) {
             context.headers = _.mapKeys(event.headers, (v, k) => k.toLowerCase());
         }
+
+        return Promise.resolve(true);
     },
 
     // HTTP calls (may) get a query string with decoded parameters
@@ -116,6 +117,8 @@ module.exports = {
                 // NOP
             }
         }
+
+        return Promise.resolve(true);
     },
 
     // HTTP calls (may) get a query string with decoded parameters
@@ -123,6 +126,8 @@ module.exports = {
         if (_.has(event, 'queryStringParameters')) {
             Object.assign(context.params, event.queryStringParameters);
         }
+
+        return Promise.resolve(true);
     },
 
     // HTTP calls (may) get a query string with decoded parameters
@@ -130,6 +135,8 @@ module.exports = {
         if (_.has(event, 'pathParameters')) {
             Object.assign(context.params, event.pathParameters);
         }
+
+        return Promise.resolve(true);
     },
 
     // POST HTTP calls (may) get a body with decoded parameters
@@ -141,62 +148,8 @@ module.exports = {
                 // NOP
             }
         }
-    },
 
-    // Multipart form attachments
-    // @credit https://github.com/myshenin/aws-lambda-multipart-parser for the basic technique and regexes
-    parseMultipart(context, event) {
-        const contentType = (context.headers || {})['content-type'] || 'text/plain';
-        const boundary = contentType.split('=')[1];
-        const body = event.body || '';
-
-        const parts = (event.isBase64Encoded ? Buffer.from(body, 'base64').toString('binary') : body)
-            .split(new RegExp(boundary))
-            .filter(item => item.match(/Content-Disposition/));
-
-        parts.map(part => {
-            if (part.match(/filename/)) {
-                // File attachment
-                const name = part
-                    .match(/name="[a-zA-Z_]+([a-zA-Z0-9_]*)"/)[0]
-                    .split('=')[1]
-                    .match(/[a-zA-Z_]+([a-zA-Z0-9_]*)/)[0];
-
-                const filename = part
-                    .match(/filename="[\w-\. ]+"/)[0]
-                    .split('=')[1]
-                    .match(/[\w-\.]+/)[0];
-
-                const containsText = part
-                    .match(/Content-Type: .+\r\n\r\n/)[0]
-                    .replace(/Content-Type: /, '')
-                    .replace(/\r\n\r\n/, '')
-                    .match(/text/);
-
-                const content = containsText ? part
-                    .split(/\r\n\r\n/)[1]
-                    .replace(/\r\n\r\n\r\n----/, '') : Buffer.from(part
-                    .split(/\r\n\r\n/)[1]
-                    .replace(/\r\n\r\n\r\n----/, ''), 'binary');
-
-                const contentType = part
-                    .match(/Content-Type: .+\r\n\r\n/)[0]
-                    .replace(/Content-Type: /, '')
-                    .replace(/\r\n\r\n/, '');
-
-                context.attachments[name] = { filename, contentType, content };
-            } else {
-                // Text parameter attachment
-                const name = part
-                    .match(/name="[a-zA-Z_]+([a-zA-Z0-9_]*)"/)[0]
-                    .split('=')[1]
-                    .match(/[a-zA-Z_]+([a-zA-Z0-9_]*)/)[0];
-
-                context.params[name] = part
-                    .split(/\r\n\r\n/)[1]
-                    .split(/\r\n--/)[0];
-            }
-        });
+        return Promise.resolve(true);
     },
 
     validateParameters(module, event, context) {
