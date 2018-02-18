@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const _ = require('lodash');
 const path = require('path');
 const glob = require('glob');
 const uuidv4 = require('uuid/v4');
@@ -74,6 +75,7 @@ module.exports = {
      * @returns {Promise}
      */
     parseParameters(module, event, context) {
+        context.attachments = {};
         context.params = {};
         context.headers = {};
 
