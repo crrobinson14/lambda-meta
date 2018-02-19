@@ -1,0 +1,9 @@
+.idea/
+*.log
+node_modules/
+coverage/
+.nyc_output/
+junit.xml
+.codecov.yml
+*.tgz
+.circleci
