@@ -273,6 +273,11 @@ module.exports = {
                 functionDef.memorySize = fn.memorySize;
             }
 
+            // @see https://github.com/FidelLimited/serverless-plugin-warmup
+            if (fn.warmup) {
+                functionDef.warmup = fn.warmup;
+            }
+
             if (fn.apiGateway) {
                 functionDef.events = functionDef.events || [];
                 functionDef.events.push({
