@@ -54,6 +54,16 @@ module.exports = {
             console.log((module.name || 'Unknown') + '(): Processing request ' + (context.awsRequestId || ''));
         }
 
+        // @see https://github.com/FidelLimited/serverless-plugin-warmup
+        if (event.source === 'serverless-plugin-warmup') {
+            /* istanbul ignore next */
+            if (!isTest) {
+                console.log('WarmUP Plugin - Lambda is warm!');
+            }
+
+            return callback(null, 'Lambda is warm!')
+        }
+
         return this.parseParameters(module, event, context)
             .then(() => this.validateParameters(module, event, context))
             .then(() => module.preprocess ? module.preprocess(event, context) : true)
@@ -153,6 +163,11 @@ module.exports = {
     },
 
     validateParameters(module, event, context) {
+        /* istanbul ignore next */
+        if (!isTest) {
+            console.log('Validating parameters');
+        }
+
         // First, sanitize unwanted inputs, but only if inputs were specified
         const inputFields = Object.keys(module.inputs || {});
         if (inputFields.length > 0) {
