@@ -180,7 +180,7 @@ module.exports = {
 
             // Shortcut further evaluations if the field is required and is missing
             if (field.required && !_.has(context.params, fieldName)) {
-                return Promise.reject(new Error('Missing required field ' + fieldName));
+                return Promise.reject(new Error('Missing required field "' + fieldName + '"'));
             }
 
             // The remaining checks apply only if the input was provided.
@@ -196,15 +196,17 @@ module.exports = {
 
                 // If the field type is specified, check for it directly
                 if (field.type && !TypeCheck(field.type, context.params[fieldName])) {
-                    return Promise.reject(new Error('Invalid "' + fieldName + '", must be of type "' +
+                    return Promise.reject(new Error('Invalid field "' + fieldName + '", must be of type "' +
                         field.type + '"'));
                 }
 
                 // If a validator is specified, call it in a Promise context
                 if (_.isFunction(field.validate)) {
-                    return Promise.resolve(field.validate(event, context)).then(r => {
-                        if (r !== true) {
-                            throw new Error('Invalid ' + fieldName);
+                    return Promise.resolve(field.validate(event, context)).then(result => {
+                        if (typeof result === 'string') {
+                            throw new Error('Invalid field "' + fieldName + '": ' + result);
+                        } else if (result !== true) {
+                            throw new Error('Invalid field "' + fieldName + '"');
                         }
                     });
                 }

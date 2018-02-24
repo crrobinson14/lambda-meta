@@ -121,7 +121,8 @@ metadata:
             //     is not required, the validator will not be called if it is missing, so that is also safe. But if the
             //     type check is omitted, the input may not be a string, so the below may fail. It is recommended that
             //     type checks are always included when validators are defined.
-            validate: (event, context) => context.params.userId.length === 36
+            //  3. For a generic error, just return true. For a custom error, return a string with the error.
+            validate: (event, context) => context.params.userId.length === 36 || 'Must be exactly 36 characters.'
         },
     },
 

@@ -11,6 +11,7 @@ const simpleResult = wrapHandler('simpleResult');
 const complexResult = wrapHandler('complexResult');
 const preprocessor = wrapHandler('preprocessor');
 const useParameters = wrapHandler('useParameters');
+const customValidationError = wrapHandler('customValidationError');
 const throwError = wrapHandler('throwError');
 const numericInput = wrapHandler('numericInput');
 const warmUp = wrapHandler('warmUp');
@@ -72,7 +73,7 @@ describe('Output Handling', () => {
 
             const response = JSON.parse(data.body);
             expect(response.status).to.equal('ERROR');
-            expect(response.error).to.equal('Missing required field userId');
+            expect(response.error).to.equal('Missing required field "userId"');
         }));
 
     it('should call validator functions properly', () => useParameters
@@ -82,7 +83,7 @@ describe('Output Handling', () => {
 
             const response = JSON.parse(data.body);
             expect(response.status).to.equal('ERROR');
-            expect(response.error).to.equal('Invalid userId');
+            expect(response.error).to.equal('Invalid field "userId"');
         }));
 
     it('should parse string JSON blocks', () => useParameters
@@ -158,7 +159,7 @@ describe('Output Handling', () => {
             expect(data.statusCode).to.equal(500);
 
             const response = JSON.parse(data.body);
-            expect(response.error).to.equal('Invalid "num", must be of type "Number"');
+            expect(response.error).to.equal('Invalid field "num", must be of type "Number"');
         }));
 
     it('should call validator functions properly', () => useParameters
@@ -171,6 +172,17 @@ describe('Output Handling', () => {
 
             const response = JSON.parse(data.body);
             expect(response.userIdRequested).to.equal(validUserId);
+        }));
+
+    it('should print custom validation errors', () => customValidationError
+        .run({
+            userId: '1234',
+        })
+        .then(data => {
+            expect(data.statusCode).to.equal(500);
+
+            const response = JSON.parse(data.body);
+            expect(response.error).to.equal('Invalid field "userId": Must be exactly 36 characters.');
         }));
 
     it('should bypass the handler for warmUp functions', () => warmUp
