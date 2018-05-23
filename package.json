@@ -1,6 +1,6 @@
 {
   "name": "lambda-meta",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "AWS Lambda Metadata Handlers",
   "main": "index.js",
   "repository": {
@@ -49,5 +49,8 @@
     "mocha": "^4.1.0",
     "mocha-junit-reporter": "^1.15.0",
     "nyc": "^11.4.1"
+  },
+  "optionalDependencies": {
+    "@iopipe/iopipe": "^1.7.0"
   }
 }

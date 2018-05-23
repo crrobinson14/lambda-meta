@@ -4,6 +4,7 @@ const glob = require('glob');
 const uuidv4 = require('uuid/v4');
 const TypeCheck = require('type-check').typeCheck;
 
+// noinspection JSUnresolvedVariable
 const isTest = process.env.NODE_ENV === 'test';
 
 class LambdaEvent {
@@ -12,6 +13,7 @@ class LambdaEvent {
         this.queryStringParameters = {};
         this.pathParameters = {};
         this.body = '';
+        this.source = '';
     }
 }
 
@@ -20,6 +22,7 @@ class LambdaModule {
     constructor() {
         this.name = 'Test';
         this.inputs = 'Test';
+        this.responseHeaders = {};
         this.preprocess = (event, context) => { };
         this.process = (event, context) => { };
     }
@@ -68,8 +71,8 @@ module.exports = {
             .then(() => this.validateParameters(module, event, context))
             .then(() => module.preprocess ? module.preprocess(event, context) : true)
             .then(() => module.process(event, context))
-            .then(result => this.respondWithSuccess(callback, result))
-            .catch(e => this.respondWithError(callback, e));
+            .then(result => this.respondWithSuccess(module, callback, result))
+            .catch(e => this.respondWithError(module, callback, e));
     },
 
     /**
@@ -81,7 +84,7 @@ module.exports = {
      * @param {Object} module - The exported module containing the handler and its metadata.
      * @param {Object} event - The event object provided by Lambda.
      * @param {Object} context - The context object provided by Lambda.
-     * @returns {Promise}
+     * @returns {PromiseLike}
      */
     parseParameters(module, event, context) {
         context.attachments = {};
@@ -188,6 +191,7 @@ module.exports = {
                 // Special case check for numbers arriving as strings. We get these from Lambda in GET request from
                 // the URL processing - EVERYTHING is a string.
                 // eslint-disable-line eqeqeq
+                // noinspection EqualityComparisonWithCoercionJS
                 if (field.type === 'Number' &&
                     !isNaN(context.params[fieldName]) &&
                     parseInt(context.params[fieldName], 10) == context.params[fieldName]) {
@@ -221,10 +225,11 @@ module.exports = {
     /**
      * End the request with an error result.
      *
+     * @param {LambdaModule} module - The module being processed. Must contain a `name` field.
      * @param {Function} callback - The callback function provided to the Lambda.
      * @param {Error} err - The error that occurred.
      */
-    respondWithError(callback, err) {
+    respondWithError(module, callback, err) {
         /* istanbul ignore next */
         if (!isTest) {
             console.error(err);
@@ -232,6 +237,7 @@ module.exports = {
 
         callback(null, {
             statusCode: 500,
+            headers: Object.assign({ 'Cache-Control': 'max-age: 10' }, module.responseHeaders || {}),
             body: JSON.stringify({ status: 'ERROR', error: err.message }),
         });
     },
@@ -239,10 +245,11 @@ module.exports = {
     /**
      * End the request with a success result.
      *
+     * @param {LambdaModule} module - The module being processed. Must contain a `name` field.
      * @param {Function} callback - The callback function provided to the Lambda.
      * @param {Object} [result] - Optional. The result to pass back to the caller.
      */
-    respondWithSuccess(callback, result) {
+    respondWithSuccess(module, callback, result) {
         /* istanbul ignore next */
         if (!isTest) {
             console.log('Success!', result);
@@ -257,6 +264,7 @@ module.exports = {
 
         callback(null, {
             statusCode: 200,
+            headers: Object.assign({ 'Cache-Control': 'max-age: 10' }, module.responseHeaders || {}),
             body: JSON.stringify(body),
         });
     },
