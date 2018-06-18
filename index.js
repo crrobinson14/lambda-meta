@@ -314,6 +314,11 @@ module.exports = {
                 });
             }
 
+            if (fn.kong) {
+                functionDef.events = functionDef.events || [];
+                functionDef.events.push({ kong: fn.kong });
+            }
+
             if (fn.schedule) {
                 functionDef.events = functionDef.events || [];
                 functionDef.events.push({
