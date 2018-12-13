@@ -1,6 +1,6 @@
 {
   "name": "lambda-meta",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "AWS Lambda Metadata Handlers",
   "main": "index.js",
   "repository": {
