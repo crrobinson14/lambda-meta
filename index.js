@@ -237,6 +237,7 @@ module.exports = {
 
         callback(null, {
             statusCode: 500,
+            isBase64Encoded: false,
             headers: Object.assign({ 'Cache-Control': 'max-age: 10' }, module.responseHeaders || {}),
             body: JSON.stringify({ status: 'ERROR', error: err.message }),
         });
@@ -264,6 +265,7 @@ module.exports = {
 
         callback(null, {
             statusCode: 200,
+            isBase64Encoded: false,
             headers: Object.assign({ 'Cache-Control': 'max-age: 10' }, module.responseHeaders || {}),
             body: JSON.stringify(body),
         });
