@@ -173,6 +173,27 @@ module.exports = {
 };
 ```
 
+## Manually controlling responses
+
+In some cases, such as when writing Cognito User Pool Triggers (which expect the function to return the exact
+parameters passed, on success, with no modification) you may need finer-grained control over how your responses
+are processed. To do this, apply the `skipResponser: true` flag in your meta-data, then make sure you call the
+callback function manually:
+
+const lm = require('lambda-meta');
+
+    module.exports = {
+        name: 'handleUserSignup',
+        skipResponse: true,
+
+        entry: (event, context, callback) => lm.processRequest(module.exports, event, context, callback),
+
+        process: (event, context, callback) => {
+            // event.request.userAttributes will contain the attributes for the new user, e.g. sub and email
+            callback(null, event);
+        }
+    };
+
 ## NOTES
 
 1. Be careful with parameter validation for URL parameters in GET requests. In Lambda, all of these arrive as strings.

@@ -23,8 +23,9 @@ class LambdaModule {
         this.name = 'Test';
         this.inputs = 'Test';
         this.responseHeaders = {};
+        this.skipResponse = false;
         this.preprocess = (event, context) => { };
-        this.process = (event, context) => { };
+        this.process = (event, context, callback) => { };
     }
 }
 
@@ -70,9 +71,9 @@ module.exports = {
         return this.parseParameters(module, event, context)
             .then(() => this.validateParameters(module, event, context))
             .then(() => module.preprocess ? module.preprocess(event, context) : true)
-            .then(() => module.process(event, context))
-            .then(result => this.respondWithSuccess(module, callback, result))
-            .catch(e => this.respondWithError(module, callback, e));
+            .then(() => module.process(event, context, callback))
+            .then(result => module.skipResponse || this.respondWithSuccess(module, callback, result))
+            .catch(e => module.skipResponse || this.respondWithError(module, callback, e));
     },
 
     /**
