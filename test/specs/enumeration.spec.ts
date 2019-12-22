@@ -9,7 +9,6 @@ const expect = chai.expect;
 describe('Function Enumeration', () => {
     it('should properly enumerate functions', () => {
         const functions = enumerateHandlers('examples/*.ts');
-        console.log('functions', functions);
 
         expect(functions.simpleResult.events[0].http.path).to.equal('simple-result');
         expect(functions.simpleResult.events[0].http.method).to.equal('get');

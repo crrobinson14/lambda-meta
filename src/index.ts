@@ -5,6 +5,7 @@ export * from './request/lm-context';
 export * from './request/request-processing';
 export * from './request/validate';
 
+export * from './response/custom-errors';
 export * from './response/error';
 export * from './response/ok';
 export * from './response/response-processing';

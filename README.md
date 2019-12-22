@@ -56,6 +56,7 @@ number of parameters to control how calls are processed. A full list of all poss
         timeout: 10000,
         memorySize: 512,
         warmup: true,
+        mergeResult: true,
         responseHeaders: {
             'Cache-Control': 'max-age: 10',
         },

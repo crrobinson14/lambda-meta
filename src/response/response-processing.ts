@@ -1,28 +1,25 @@
 import { LMHandler, logInfo, logError, OkResponse, ErrorResponse } from '..';
 
 export class AnnotatedError extends Error {
-    httpResponseCode = 500;
+    responseHttpCode = 500;
 }
 
 export class AnnotatedResult {
-    httpResponseCode = 200;
-
+    responseHttpCode = 200;
     [key: string]: any;
 }
 
 /** End the request with an error result. */
-export function respondWithError(handler: LMHandler, err: Error | AnnotatedError, callback: Function) {
+export function respondWithError(handler: LMHandler, err: any | Error, callback: Function) {
     logError(err);
 
     const response: ErrorResponse = {
         status: 'ERROR',
+        code: err.name,
         error: err.message,
     };
 
-    let statusCode = 500;
-    if (err instanceof AnnotatedError) {
-        statusCode = err.httpResponseCode || 500;
-    }
+    const statusCode = err.responseHttpCode || 500;
 
     callback(null, {
         statusCode,
@@ -33,18 +30,21 @@ export function respondWithError(handler: LMHandler, err: Error | AnnotatedError
 }
 
 /** End the request with a success result. */
-export function respondWithSuccess(handler: LMHandler, result: any | AnnotatedResult, callback: Function) {
+export function respondWithSuccess(handler: LMHandler, result: any, callback: Function) {
     logInfo('Success!', result);
-
-    let statusCode = 200;
-    if (result instanceof AnnotatedResult) {
-        statusCode = result.httpResponseCode || 200;
-    }
 
     const response: OkResponse = {
         status: 'OK',
-        result,
     };
+
+    if (handler.mergeResult) {
+        Object.assign(response, result || {});
+    } else {
+        response.result = result;
+    }
+
+    const statusCode = result.responseHttpCode || 200;
+    delete result.responseHttpCode;
 
     callback(null, {
         statusCode,

@@ -25,8 +25,8 @@ export abstract class LMHandler {
     /** Optional memory size specifically for the function. Overrides the global value. */
     memorySize?: number;
 
-    /** Optional schedule to pass through to Serverless. */
-    schedule?: any;
+    /** Set to true to Object.assign() result objects to the root of the response object instead of response.result. */
+    mergeResult?: boolean;
 
     /** Methods for triggering the function */
     events?: any[];

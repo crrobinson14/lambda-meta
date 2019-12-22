@@ -1,4 +1,4 @@
-import { LMHandler, LMContext, processRequest } from '../src';
+import { LMHandler, LMContext, processRequest, TooManyRequestsError } from '../src';
 
 const handler: LMHandler = {
     entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
@@ -6,7 +6,7 @@ const handler: LMHandler = {
     description: 'Illustrates error handling.',
 
     async process(event: any, context: LMContext) {
-        throw new Error('Invalid XYZ.');
+        throw new TooManyRequestsError('Invalid XYZ.');
     },
 };
 

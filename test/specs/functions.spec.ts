@@ -48,6 +48,7 @@ const preprocessor = wrapHandler('preprocessor');
 const useParameters = wrapHandler('useParameters');
 const customValidationError = wrapHandler('customValidationError');
 const throwError = wrapHandler('throwError');
+const responseCode = wrapHandler('responseCode');
 const numericInput = wrapHandler('numericInput');
 const warmUp = wrapHandler('warmUp');
 const headers = wrapHandler('headers');
@@ -79,6 +80,7 @@ describe('Output Handling', () => {
         .test({})
         .then(data => {
             expect(data.statusCode).to.equal(200);
+            console.log('d', data);
 
             const response = JSON.parse(data.body);
             expect(response.status).to.equal('OK');
@@ -88,11 +90,22 @@ describe('Output Handling', () => {
     it('should handle errors gracefully', () => throwError
         .test({})
         .then(data => {
-            expect(data.statusCode).to.equal(500);
+            console.log('response', data);
+            expect(data.statusCode).to.equal(429);
 
             const response = JSON.parse(data.body);
             expect(response.status).to.equal('ERROR');
+            expect(response.code).to.equal('TooManyRequestsError');
             expect(response.error).to.equal('Invalid XYZ.');
+        }));
+
+    it('should allow overriding the responseHttpCode', () => responseCode
+        .test({})
+        .then(data => {
+            expect(data.statusCode).to.equal(204);
+
+            const response = JSON.parse(data.body);
+            expect(response.status).to.equal('OK');
         }));
 
     it('should check for required inputs properly', () => useParameters
@@ -125,7 +138,7 @@ describe('Output Handling', () => {
         }));
 
     it('should parse string bodies', () => useParameters
-        .run({ body: `{ "userId": "${validUserId}" }` })
+        .test({ body: `{ "userId": "${validUserId}" }` })
         .then(data => {
             expect(data.statusCode).to.equal(200);
 
@@ -134,7 +147,7 @@ describe('Output Handling', () => {
         }));
 
     it('should parse query headers', () => headers
-        .run({ headers: { Authorization: 'Bearer XYZ' } })
+        .test({ headers: { Authorization: 'Bearer XYZ' } })
         .then(data => {
             expect(data.statusCode).to.equal(200);
 
@@ -143,7 +156,7 @@ describe('Output Handling', () => {
         }));
 
     it('should parse query strings', () => useParameters
-        .run({
+        .test({
             queryStringParameters: { userId: validUserId }
         })
         .then(data => {
@@ -154,7 +167,7 @@ describe('Output Handling', () => {
         }));
 
     it('should parse path parameters', () => useParameters
-        .run({
+        .test({
             pathParameters: { userId: validUserId }
         })
         .then(data => {
@@ -165,7 +178,7 @@ describe('Output Handling', () => {
         }));
 
     it('should handle numeric input checking', () => numericInput
-        .run({ num: 1 })
+        .test({ num: 1 })
         .then(data => {
             expect(data.statusCode).to.equal(200);
 
@@ -174,7 +187,7 @@ describe('Output Handling', () => {
         }));
 
     it('should handle "string" numbers (query/path params)', () => numericInput
-        .run({ num: '1' })
+        .test({ num: '1' })
         .then(data => {
             expect(data.statusCode).to.equal(200);
 
@@ -183,7 +196,7 @@ describe('Output Handling', () => {
         }));
 
     it('should block true strings -> numbers', () => numericInput
-        .run({ num: 'a' })
+        .test({ num: 'a' })
         .then(data => {
             expect(data.statusCode).to.equal(500);
 
@@ -192,7 +205,7 @@ describe('Output Handling', () => {
         }));
 
     it('should call validator functions properly', () => useParameters
-        .run({
+        .test({
             userId: validUserId,
             fieldWithBogusValidator: 'abc',
         })
@@ -204,7 +217,7 @@ describe('Output Handling', () => {
         }));
 
     it('should print custom validation errors', () => customValidationError
-        .run({
+        .test({
             userId: '1234',
         })
         .then(data => {
@@ -215,13 +228,13 @@ describe('Output Handling', () => {
         }));
 
     it('should bypass the handler for warmUp functions', () => warmUp
-        .run({ source: 'serverless-plugin-warmup' })
+        .test({ source: 'serverless-plugin-warmup' })
         .then(data => {
             expect(data).to.equal('Lambda is warm!');
         }));
 
     it('should call validator functions properly', () => warmUp
-        .run({})
+        .test({})
         .then(data => {
             expect(data.statusCode).to.equal(200);
 
