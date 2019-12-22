@@ -31,7 +31,7 @@ const handler: LMHandler = {
         }
 
         // The return result from our handler will be the result passed back to the caller.
-        return { userIdRequested: context.params.userId };
+        return { userIdRequested: context.params.userId, session: context.session };
     }
 };
 

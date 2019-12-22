@@ -77,20 +77,18 @@ describe('Output Handling', () => {
         }));
 
     it('should execute preprocessors properly', () => preprocessor
-        .test({})
+        .test({ userId: validUserId })
         .then(data => {
             expect(data.statusCode).to.equal(200);
-            console.log('d', data);
 
             const response = JSON.parse(data.body);
             expect(response.status).to.equal('OK');
-            expect(response.session.valid).to.be.false();
+            expect(response.result.session.valid).to.be.false();
         }));
 
     it('should handle errors gracefully', () => throwError
         .test({})
         .then(data => {
-            console.log('response', data);
             expect(data.statusCode).to.equal(429);
 
             const response = JSON.parse(data.body);
@@ -134,7 +132,7 @@ describe('Output Handling', () => {
             expect(data.statusCode).to.equal(200);
 
             const response = JSON.parse(data.body);
-            expect(response.userIdRequested).to.equal(validUserId);
+            expect(response.result.userIdRequested).to.equal(validUserId);
         }));
 
     it('should parse string bodies', () => useParameters
@@ -143,7 +141,7 @@ describe('Output Handling', () => {
             expect(data.statusCode).to.equal(200);
 
             const response = JSON.parse(data.body);
-            expect(response.userIdRequested).to.equal(validUserId);
+            expect(response.result.userIdRequested).to.equal(validUserId);
         }));
 
     it('should parse query headers', () => headers
@@ -152,7 +150,7 @@ describe('Output Handling', () => {
             expect(data.statusCode).to.equal(200);
 
             const response = JSON.parse(data.body);
-            expect(response.headers.authorization).to.equal('Bearer XYZ');
+            expect(response.result.headers.authorization).to.equal('Bearer XYZ');
         }));
 
     it('should parse query strings', () => useParameters
@@ -163,7 +161,7 @@ describe('Output Handling', () => {
             expect(data.statusCode).to.equal(200);
 
             const response = JSON.parse(data.body);
-            expect(response.userIdRequested).to.equal(validUserId);
+            expect(response.result.userIdRequested).to.equal(validUserId);
         }));
 
     it('should parse path parameters', () => useParameters
@@ -174,7 +172,7 @@ describe('Output Handling', () => {
             expect(data.statusCode).to.equal(200);
 
             const response = JSON.parse(data.body);
-            expect(response.userIdRequested).to.equal(validUserId);
+            expect(response.result.userIdRequested).to.equal(validUserId);
         }));
 
     it('should handle numeric input checking', () => numericInput
@@ -183,7 +181,7 @@ describe('Output Handling', () => {
             expect(data.statusCode).to.equal(200);
 
             const response = JSON.parse(data.body);
-            expect(response.num).to.equal(1);
+            expect(response.result.num).to.equal(1);
         }));
 
     it('should handle "string" numbers (query/path params)', () => numericInput
@@ -192,7 +190,7 @@ describe('Output Handling', () => {
             expect(data.statusCode).to.equal(200);
 
             const response = JSON.parse(data.body);
-            expect(response.num).to.equal(1);
+            expect(response.result.num).to.equal(1);
         }));
 
     it('should block true strings -> numbers', () => numericInput
@@ -213,7 +211,7 @@ describe('Output Handling', () => {
             expect(data.statusCode).to.equal(200);
 
             const response = JSON.parse(data.body);
-            expect(response.userIdRequested).to.equal(validUserId);
+            expect(response.result.userIdRequested).to.equal(validUserId);
         }));
 
     it('should print custom validation errors', () => customValidationError
