@@ -20,12 +20,6 @@ const headers = wrapHandler('headers');
 const validUserId = '6576BCA5-946B-41AC-AC91-E4096E95E3CD';
 
 describe('Output Handling', () => {
-    it('should tolerate functions with no names', () => noName
-        .run({})
-        .then(data => {
-            expect(data.statusCode).to.equal(200);
-        }));
-
     it('should return literal results directly', () => simpleResult
         .run({})
         .then(data => {

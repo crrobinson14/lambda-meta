@@ -19,9 +19,52 @@ check each field. Validators are Promise-based and may thus be asynchronous (e.g
 
 Usage is fairly simple. Install the module (`npm i -S lambda-meta`), then create each handler file as follows:
 
-    const lm = require('lambda-meta');
+    // ES6/TS:
+    import { LambdaMeta } = from 'lambda-meta';
 
     module.exports = {
+        name: 'useParameters',
+        description: 'Sample method that requires a parameter, with input validation.',
+
+        // These are optional and override the global defaults in serverless.js.
+        timeout: 10000,
+        memorySize: 512,
+        warmup: true,
+        responseHeaders: {
+            'Cache-Control': 'max-age: 10',
+        },
+
+        apiGateway: {
+            path: 'function/path',
+            method: 'post',
+        },
+
+        inputs: {
+            userId: {
+                required: true,
+                type: 'String',
+                description: 'String user ID to retrieve.',
+                validate: userId => userId.length === 36
+            },
+        },
+
+        entry: (event, context, callback) => LambdaMeta.processRequest(module.exports, event, context, callback),
+
+        process: (event, context) => {
+            // Note that we can rely on context.params being defined and being an object. And context.params.userId will
+            // be defined and be a string.
+            console.log('Got a request for user ' + context.params.userId, event);
+
+            // The return result from our handler will be the result passed back to the caller.
+            return { userIdRequested: context.params.userId };
+        }
+    };
+
+TypeScript/ES6 are also supported:
+
+    import { LambdaMeta } = from 'lambda-meta';
+
+    export default {
         name: 'useParameters',
         description: 'Sample method that requires a parameter, with input validation.',
 
@@ -30,11 +73,11 @@ Usage is fairly simple. Install the module (`npm i -S lambda-meta`), then create
                 required: true,
                 type: 'String',
                 description: 'String user ID to retrieve.',
-                validate: (event, context) => context.params.userId.length === 36
+                validate: userId => userId.length === 36
             },
         },
 
-        entry: (event, context, callback) => lm.processRequest(module.exports, event, context, callback),
+        entry: (event, context, callback) => LambdaMeta.processRequest(module.exports, event, context, callback),
 
         process: (event, context) => {
             // Note that we can rely on context.params being defined and being an object. And context.params.userId will
@@ -59,7 +102,7 @@ other tasks like generating API documentation.
 
 Next, one boilerplate line is added:
 
-    entry: (event, context, callback) => lm.processRequest(module.exports, event, context, callback),
+    entry: (event, context, callback) => LambdaMeta.processRequest(module.exports, event, context, callback),
 
 `entry` should be defined in AWS Lambda (or Serverless, etc.) as the function's entry point. This line maps the Lambda
 entry point to the Lambda Meta request handling wrapper. (I looked for a way to automate this step but Lambda does not
@@ -91,7 +134,7 @@ generic. Business logic related to the function itself should be in `process`:
 Note that parameters are logged for debugging purposes, but `password` is automatically filtered for security reasons.
 To add additional parameters to be filtered/omitted from logging, set `noLogParams`:
 
-    lm.noLogParams = ['password', 'accessToken', 'bigBodyField'];
+    LambdaMeta.noLogParams = ['password', 'accessToken', 'bigBodyField'];
 
 ## Input Validation
 
@@ -116,13 +159,14 @@ metadata:
             //  1. All validators are called in parallel (e.g. Promise.all([validators]). Resolution is
             //     non-deterministic, and although inputs other than the one being validated MAY be defined, validators
             //     should not rely on this. Use 'preprocess()' for more complex operations on multiple inputs.
-            //  2. If a field is required and must be a certain type, those are checked before the validator is called.
-            //     Therefore, the below is "safe" because this field is both required and must be a string. If the field
-            //     is not required, the validator will not be called if it is missing, so that is also safe. But if the
-            //     type check is omitted, the input may not be a string, so the below may fail. It is recommended that
-            //     type checks are always included when validators are defined.
-            //  3. For a generic error, just return true. For a custom error, return a string with the error.
-            validate: (event, context) => context.params.userId.length === 36 || 'Must be exactly 36 characters.'
+            //  2. If a field is required and must be a certain type, those are checked BEFORE the validator is called.
+            //     For non-required fields, validators are not called if the parameter is not sent. Thus, it is not 
+            //     necessary to tolerate undefined/missing params. Note that allParams is also sent to the validator
+            //     to support cases where multiple params need to be checked at once (e.g. to conditionally require
+            //     param B if param A is set to a certain value.)
+            //  3. Validators should return true to indicate success, false to generate a generic "Invalid field" error,
+            //     or a string to generate a custom error response.
+            validate: (userId, allParams) => userId.length === 36 || 'Must be exactly 36 characters.'
         },
     },
 
@@ -132,26 +176,29 @@ processing functions.
 
 ## Output Processing
 
-Responses are formatted with a consistent `status` field. Additional fields will be merged in from the return result of
-the `process` function. For example, `process(event, context) => ({ environment: 'test' })` would output:
+Responses are formatted with a consistent `status` field. The return result from the handler will be asigned to the
+`result` field. Optionally, developers can set LambdaMeta.expandResults = true to assign return object fields to the
+root of the response object. Examples: 
 
-    {
-        status: 'OK',
-        environment: 'test'
-    }
-
-If the return result is not an object (e.g. a literal string) it will be assigned to a field called `result`. For
-example, `process(event, context) => ('It worked!')` would output:
-
-    {
-        status: 'OK',
-        result: 'It worked!'
-    }
+    // Given:
+    // process(event, context) => 'test'
+    // Response will be:
+    // { status: 'OK', result: 'test' }
+    
+    // Given:
+    process(event, context) => ({ environment: 'test' })
+    // Response will be:
+    // { status: 'OK', result: { environment: 'test' } }
+    
+    // For:
+    LambdaMeta.expandResults = true;
+    process(event, context) => ({ environment: 'test' })
+    // Response will be:
+    // { status: 'OK', environment: 'test' }
+    
 
 If an error is thrown by the processor (or preprocessor), it will be logged to the Lambda logs and the message (but not
 the call stack, for security reasons) will be output to the caller:
-
-example, `process(event, context) => (new Error('It failed!'))` would output:
 
     {
         status: 'ERROR',
@@ -165,11 +212,11 @@ it can be used to build a definition of known functions based on their metadata:
 
 ```
 // serverless.js:
-const lm = require('lambda-meta);
+const LambdaMeta = require('lambda-meta);
 module.exports = {
     service: 'xyz',
     // ...
-    functions: lm.enumerateFunctions('functions/**/*.js'),
+    functions: LambdaMeta.enumerateFunctions('functions/**/*.js'),
 };
 ```
 
@@ -186,7 +233,7 @@ const lm = require('lambda-meta');
         name: 'handleUserSignup',
         skipResponse: true,
 
-        entry: (event, context, callback) => lm.processRequest(module.exports, event, context, callback),
+        entry: (event, context, callback) => LambdaMeta.processRequest(module.exports, event, context, callback),
 
         process: (event, context, callback) => {
             // event.request.userAttributes will contain the attributes for the new user, e.g. sub and email

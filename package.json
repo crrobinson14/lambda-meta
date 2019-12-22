@@ -1,8 +1,9 @@
 {
   "name": "lambda-meta",
-  "version": "2.1.2",
+  "version": "3.0.0",
   "description": "AWS Lambda Metadata Handlers",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/crrobinson14/lambda-meta.git"
@@ -16,39 +17,60 @@
   },
   "homepage": "https://github.com/crrobinson14/lambda-meta#readme",
   "scripts": {
-    "lint": "eslint --ext .js functions test lib migrations models",
+    "build": "tsc",
+    "lint": "tslint -c tslint.json --project tsconfig.json",
+    "prepublishOnly": "npm run build",
+    "cover": "nyc mocha",
     "test": "cross-env NODE_ENV=test nyc mocha",
     "test_circle": "cross-env NODE_ENV=test node_modules/.bin/nyc mocha --reporter mocha-junit-reporter --reporter-options mochaFile=./junit.xml"
   },
   "nyc": {
+    "lines": 85,
+    "statements": 85,
+    "functions": 85,
+    "branches": 85,
     "include": [
-      "index.js"
+      "src"
     ],
     "exclude": [
-      "test",
-      "examples",
-      "node_modules"
+      "test"
+    ],
+    "extension": [
+      ".ts"
     ],
     "reporter": [
       "lcov",
       "html",
       "text-summary"
-    ]
+    ],
+    "cache": true,
+    "all": true,
+    "check-coverage": true,
+    "report-dir": "./coverage"
   },
   "dependencies": {
-    "lodash": "^4.17.15",
+    "glob": "^7.1.6",
     "type-check": "^0.3.2",
-    "uuid": "^3.3.3"
+    "uuidv4": "^6.0.0"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.39",
+    "@types/glob": "^7.1.1",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.12.21",
+    "@types/type-check": "^0.3.27",
+    "@types/uuid": "^3.4.6",
+    "aws-lambda": "^0.1.2",
     "chai": "^4.2.0",
     "cross-env": "^6.0.3",
     "dirty-chai": "^2.0.1",
-    "glob": "^7.1.5",
     "lambda-wrapper": "^0.3.0",
     "mocha": "^6.2.2",
     "mocha-junit-reporter": "^1.23.1",
-    "nyc": "^14.1.1"
+    "nyc": "^14.1.1",
+    "ts-node": "^8.5.4",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.4"
   },
   "optionalDependencies": {
     "@iopipe/iopipe": "^1.7.0"

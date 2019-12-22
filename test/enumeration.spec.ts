@@ -1,4 +1,5 @@
-const lm = require('../index');
+import { enumerateHandlers } from '../src';
+
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
 
@@ -7,7 +8,9 @@ const expect = chai.expect;
 
 describe('Function Enumeration', () => {
     it('should properly enumerate functions', () => {
-        const functions = lm.enumerateFunctions('examples/*.js');
+        const functions = enumerateHandlers('examples/*.ts');
+        console.log('functions', functions);
+
         expect(functions.simpleResult.events[0].http.path).to.equal('simple-result');
         expect(functions.simpleResult.events[0].http.method).to.equal('get');
 
