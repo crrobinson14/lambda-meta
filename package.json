@@ -22,7 +22,8 @@
     "prepublishOnly": "npm run build",
     "cover": "nyc mocha",
     "test": "cross-env NODE_ENV=test nyc mocha",
-    "test_circle": "cross-env NODE_ENV=test node_modules/.bin/nyc mocha --reporter mocha-junit-reporter --reporter-options mochaFile=./junit.xml"
+    "test_circle": "cross-env NODE_ENV=test nyc mocha",
+    "test_circleX": "cross-env NODE_ENV=test node_modules/.bin/nyc mocha --reporter mocha-junit-reporter --reporter-options mochaFile=./junit.xml"
   },
   "nyc": {
     "lines": 85,
