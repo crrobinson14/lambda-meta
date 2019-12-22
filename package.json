@@ -2,8 +2,8 @@
   "name": "lambda-meta",
   "version": "3.0.0",
   "description": "AWS Lambda Metadata Handlers",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/crrobinson14/lambda-meta.git"
