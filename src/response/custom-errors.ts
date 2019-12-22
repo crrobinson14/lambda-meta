@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 export class BadRequestError extends Error {
     responseHttpCode = 400;
 

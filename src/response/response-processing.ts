@@ -1,9 +1,11 @@
 import { LMHandler, logInfo, logError, OkResponse, ErrorResponse } from '..';
 
+/* istanbul ignore next */
 export class AnnotatedError extends Error {
     responseHttpCode = 500;
 }
 
+/* istanbul ignore next */
 export class AnnotatedResult {
     responseHttpCode = 200;
     [key: string]: any;
@@ -43,8 +45,11 @@ export function respondWithSuccess(handler: LMHandler, result: any, callback: Fu
         response.result = result;
     }
 
-    const statusCode = result.responseHttpCode || 200;
-    delete result.responseHttpCode;
+    let statusCode = 200;
+    if (result && result.responseHttpCode) {
+        statusCode = result.responseHttpCode;
+        delete result.responseHttpCode;
+    }
 
     callback(null, {
         statusCode,

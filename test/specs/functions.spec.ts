@@ -50,6 +50,7 @@ const customValidationError = wrapHandler('customValidationError');
 const throwError = wrapHandler('throwError');
 const responseCode = wrapHandler('responseCode');
 const numericInput = wrapHandler('numericInput');
+const mergeNothing = wrapHandler('mergeNothing');
 const warmUp = wrapHandler('warmUp');
 const headers = wrapHandler('headers');
 
@@ -173,6 +174,12 @@ describe('Output Handling', () => {
 
             const response = JSON.parse(data.body);
             expect(response.result.userIdRequested).to.equal(validUserId);
+        }));
+
+    it('should tolerate requests to merge results when none are returned', () => mergeNothing
+        .test({})
+        .then(data => {
+            expect(data.statusCode).to.equal(200);
         }));
 
     it('should handle numeric input checking', () => numericInput

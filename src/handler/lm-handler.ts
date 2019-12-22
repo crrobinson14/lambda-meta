@@ -45,10 +45,12 @@ export abstract class LMHandler {
      */
     entry?: (event: any, context: Context, callback: Function) => any;
 
+    /* istanbul ignore next */
     /** Optional pre-processing function for tasks like authentication checks. */
     async preprocess?(event: any, context: LMContext): Promise<any> {
     }
 
+    /* istanbul ignore next */
     /**
      * Required processing function. Typically expected to be async and return a value to be passed back to the caller
      * in a standard wrapper. May optionally call callback() to provide its own response if `skipResponse` is set.
