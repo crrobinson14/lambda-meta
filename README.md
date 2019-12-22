@@ -17,12 +17,82 @@ check each field. Validators are Promise-based and may thus be asynchronous (e.g
 
 ## Usage
 
-Usage is fairly simple. Install the module (`npm i -S lambda-meta`), then create each handler file as follows:
+Usage is fairly simple. Install the module (`npm i -S lambda-meta`), then create each handler file with this template:
 
     // ES6/TS:
-    import { LambdaMeta } = from 'lambda-meta';
+    import { LMHandler, LMContext, processRequest } from 'lambda-meta';
+
+    const handler: LMHandler = {
+        entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
+        ...
+        async process(event: any, context: LMContext) {
+            return true;
+        }
+    };
+    
+    module.exports = handler;
+
+    // ES5:
+    const { LMContext, processRequest } = require('lambda-meta');
 
     module.exports = {
+        entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
+        ...
+        async process(event: any, context: LMContext) {
+            return true;
+        }
+    };
+    
+Lambda-Meta will take care of a number of request processing sets for you, including parsing parameters from all
+possible methods (path, query, body, and directly injected via `sls invoke` calls or other sources) and providing a
+number of parameters to control how calls are processed. A full list of all possible options is below:  
+    
+    import { LMHandler, LMContext, processRequest } from 'lambda-meta';
+    
+    const handler: Handler = {
+        entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
+        name: 'allOptions',
+        description: 'Sample method illustrating the use of all possible options',
+        timeout: 10000,
+        memorySize: 512,
+        warmup: true,
+        responseHeaders: {
+            'Cache-Control': 'max-age: 10',
+        },
+        events: [{
+            http: {
+                path: 'get/my/env',
+                method: 'get',
+                cors: true,
+            }
+        }, {
+            schedule: 'cron(*/5 * * * ? *)',
+        }],
+        inputs: {
+            userId: {
+                required: true,
+                type: 'String',
+                description: 'String user ID to retrieve.',
+                validate: userId => userId.length === 36
+            },
+        },
+            
+        async preprocess(event: any, context: MetaContext) {
+            context: 
+        }
+            
+        async process(event: any, context: MetaContext) {
+            return {
+                environment: process.env.NODE_ENV || 'development',
+            };
+        }
+    };
+    
+    module.exports = handler;
+
+    import { LambdaMeta } = from 'lambda-meta';
+        const handler: Handler = {
+        entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
         name: 'useParameters',
         description: 'Sample method that requires a parameter, with input validation.',
 

@@ -1,6 +1,7 @@
-import { Handler, MetaContext } from '../src';
+import { LMHandler, LMContext, processRequest } from '../src';
 
-const handler: Handler = {
+const handler: LMHandler = {
+    entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
     name: 'preprocessor',
     description: 'Example preprocessor usage.',
     inputs: {
@@ -16,13 +17,13 @@ const handler: Handler = {
     },
 
     // Since we're async, we could do things like load a user's session record from a DB/cache.
-    async preprocess(event: any, context: MetaContext) {
+    async preprocess(event: any, context: LMContext) {
         context.session = {
             valid: false
         };
     },
 
-    async process(event: any, context: MetaContext) {
+    async process(event: any, context: LMContext) {
         // Note that we can rely on context.params being defined and being an object. And context.params.userId will
         // be defined and be a string.
         if (process.env.NODE_ENV !== 'test') {

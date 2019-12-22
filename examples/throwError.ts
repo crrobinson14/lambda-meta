@@ -1,12 +1,11 @@
-import { Handler, MetaContext } from '../src';
+import { LMHandler, LMContext, processRequest } from '../src';
 
-const handler: Handler = {
+const handler: LMHandler = {
+    entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
     name: 'throwError',
     description: 'Illustrates error handling.',
-    timeout: 30,
-    memorySize: 256,
 
-    async process(event: any, context: MetaContext) {
+    async process(event: any, context: LMContext) {
         throw new Error('Invalid XYZ.');
     },
 };

@@ -1,6 +1,7 @@
-import { Handler, MetaContext } from '../src';
+import { LMHandler, LMContext, processRequest } from '../src';
 
-const handler: Handler = {
+const handler: LMHandler = {
+    entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
     name: 'useParameters',
     description: 'Sample method that requires a parameter, with input validation.',
     inputs: {
@@ -15,7 +16,7 @@ const handler: Handler = {
         },
     },
 
-    async process(event: any, context: MetaContext) {
+    async process(event: any, context: LMContext) {
         // Note that we can rely on context.params being defined and being an object. And context.params.userId will
         // be defined and be a string.
         if (process.env.NODE_ENV !== 'test') {

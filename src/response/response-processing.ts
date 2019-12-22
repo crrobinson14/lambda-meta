@@ -1,4 +1,4 @@
-import { NodeCallbackAny, Handler, logInfo, logError, OkResponse, ErrorResponse } from '..';
+import { LMHandler, logInfo, logError, OkResponse, ErrorResponse } from '..';
 
 export class AnnotatedError extends Error {
     httpResponseCode = 500;
@@ -11,7 +11,7 @@ export class AnnotatedResult {
 }
 
 /** End the request with an error result. */
-export function respondWithError(handler: Handler, err: Error | AnnotatedError, callback: NodeCallbackAny) {
+export function respondWithError(handler: LMHandler, err: Error | AnnotatedError, callback: Function) {
     logError(err);
 
     const response: ErrorResponse = {
@@ -33,7 +33,7 @@ export function respondWithError(handler: Handler, err: Error | AnnotatedError, 
 }
 
 /** End the request with a success result. */
-export function respondWithSuccess(handler: Handler, result: any | AnnotatedResult, callback: NodeCallbackAny) {
+export function respondWithSuccess(handler: LMHandler, result: any | AnnotatedResult, callback: Function) {
     logInfo('Success!', result);
 
     let statusCode = 200;

@@ -1,7 +1,7 @@
 import { typeCheck as TypeCheck } from 'type-check';
-import { Handler, InputField, ValidationCallback, MetaContext, logInfo } from '..';
+import { LMHandler, InputField, ValidationCallback, LMContext, logInfo } from '..';
 
-export async function validateParameters(handler: Handler, event: any, context: MetaContext): Promise<boolean> {
+export async function validateParameters(handler: LMHandler, event: any, context: LMContext): Promise<boolean> {
     logInfo('Validating parameters');
 
     const { inputs } = handler;

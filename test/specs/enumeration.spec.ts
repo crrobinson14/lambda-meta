@@ -1,4 +1,4 @@
-import { enumerateHandlers } from '../src';
+import { enumerateHandlers } from '../../src';
 
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
@@ -14,8 +14,9 @@ describe('Function Enumeration', () => {
         expect(functions.simpleResult.events[0].http.path).to.equal('simple-result');
         expect(functions.simpleResult.events[0].http.method).to.equal('get');
 
-        expect(functions.throwError.events[0].schedule).to.equal('cron(*/5 * * * ? *)');
-        expect(functions.throwError.memorySize).to.equal(256);
-        expect(functions.throwError.timeout).to.equal(30);
+        expect(functions.schedule.events[0].schedule).to.equal('cron(*/5 * * * ? *)');
+
+        expect(functions.customOptions.memorySize).to.equal(256);
+        expect(functions.customOptions.timeout).to.equal(30);
     });
 });

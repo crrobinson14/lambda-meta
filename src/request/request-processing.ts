@@ -1,16 +1,8 @@
 import { uuid } from 'uuidv4';
-import {
-    Handler,
-    MetaContext,
-    logInfo,
-    NodeCallbackAny,
-    validateParameters,
-    respondWithError,
-    respondWithSuccess
-} from '..';
+import { LMHandler, LMContext, logInfo, validateParameters, respondWithError, respondWithSuccess } from '..';
 
 /** Any call my include a query string with decoded parameters */
-export async function parseQueryString(context: MetaContext, event: any) {
+export async function parseQueryString(context: LMContext, event: any) {
     if (event.queryStringParameters !== undefined) {
         Object.assign(context.params, event.queryStringParameters);
     }
@@ -19,7 +11,7 @@ export async function parseQueryString(context: MetaContext, event: any) {
 }
 
 /** Any call may include positional path parameters in the URI */
-export async function parsePath(context: MetaContext, event: any) {
+export async function parsePath(context: LMContext, event: any) {
     if (event.pathParameters !== undefined) {
         Object.assign(context.params, event.pathParameters);
     }
@@ -28,7 +20,7 @@ export async function parsePath(context: MetaContext, event: any) {
 }
 
 /** POST calls (may) get a body with decoded parameters */
-export async function parseBody(context: MetaContext, event: any) {
+export async function parseBody(context: LMContext, event: any) {
     if (typeof event.body === 'string' && event.body[0] === '{') {
         try {
             Object.assign(context.params, JSON.parse(event.body));
@@ -41,7 +33,7 @@ export async function parseBody(context: MetaContext, event: any) {
 }
 
 /** Any call may include custom headers. Note that we lowercase the keys so developers don't need to worry about it. */
-export async function parseHeaders(context: MetaContext, event: any) {
+export async function parseHeaders(context: LMContext, event: any) {
     if (event.headers !== undefined) {
         context.headers = {};
         Object.entries(event.headers).forEach(([key, value]: [string, any]) => {
@@ -53,7 +45,7 @@ export async function parseHeaders(context: MetaContext, event: any) {
 }
 
 // HTTP calls (may) get a query string with decoded parameters
-export async function parseRawEvent(context: MetaContext, event: any) {
+export async function parseRawEvent(context: LMContext, event: any) {
     // Direct calls include the params in the "event" as a string
     if (typeof event === 'object' && event.queryStringParameters === undefined && event.pathParameters === undefined) {
         Object.assign(context.params, event);
@@ -77,7 +69,7 @@ export async function parseRawEvent(context: MetaContext, event: any) {
  *   2. Parse query string and body parameters in order of GET -> POST -> POST (multipart).
  *   3. Log an entry with some helpful tracing metadata (e.g. the request ID)
  */
-export async function parseParameters(handler: Handler, event: any, context: MetaContext) {
+export async function parseParameters(handler: LMHandler, event: any, context: LMContext) {
     context.params = {};
     context.headers = {};
 
@@ -91,7 +83,7 @@ export async function parseParameters(handler: Handler, event: any, context: Met
 }
 
 /** Wrapper for processing requests. */
-export async function processRequest(handler: Handler, event: any, inputContext: MetaContext | any, callback: NodeCallbackAny) {
+export async function processRequest(handler: LMHandler, event: any, inputContext: LMContext | any, callback: Function) {
     let context = inputContext;
     context.callbackWaitsForEmptyEventLoop = false;
 

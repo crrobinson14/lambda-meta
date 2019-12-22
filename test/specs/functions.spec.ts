@@ -1,12 +1,47 @@
-const wrapper = require('lambda-wrapper');
+import { LMHandler } from '../../src';
+import { uuid } from 'uuidv4';
+import { Context } from 'aws-lambda';
+
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
 
 chai.use(dirtyChai);
 const expect = chai.expect;
 
-const wrapHandler = name => wrapper.wrap(require('../examples/' + name), { handler: 'entry' });
-const noName = wrapHandler('noName');
+const wrapHandler = name => {
+    const handler: LMHandler = require(`../../examples/${name}`);
+
+    const context: Context = {
+        getRemainingTimeInMillis: () => 5000,
+        functionName: name,
+        functionVersion: '1',
+        invokedFunctionArn: name,
+        memoryLimitInMB: '1024',
+        awsRequestId: uuid(),
+        logGroupName: name,
+        logStreamName: name,
+        callbackWaitsForEmptyEventLoop: true,
+        done(error?: Error, result?: any) {
+        },
+        fail(error: Error | string) {
+        },
+        succeed(messageOrObject: any) {
+        },
+    };
+
+    handler.test = params => new Promise((resolve, reject) => {
+        handler.entry(params || {}, context, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        });
+    });
+
+    return handler;
+};
+
 const simpleResult = wrapHandler('simpleResult');
 const complexResult = wrapHandler('complexResult');
 const preprocessor = wrapHandler('preprocessor');
@@ -21,7 +56,7 @@ const validUserId = '6576BCA5-946B-41AC-AC91-E4096E95E3CD';
 
 describe('Output Handling', () => {
     it('should return literal results directly', () => simpleResult
-        .run({})
+        .test({})
         .then(data => {
             expect(data.statusCode).to.equal(200);
 
@@ -31,7 +66,7 @@ describe('Output Handling', () => {
         }));
 
     it('should return object results merged', () => complexResult
-        .run({})
+        .test({})
         .then(data => {
             expect(data.statusCode).to.equal(200);
 
@@ -41,7 +76,7 @@ describe('Output Handling', () => {
         }));
 
     it('should execute preprocessors properly', () => preprocessor
-        .run({})
+        .test({})
         .then(data => {
             expect(data.statusCode).to.equal(200);
 
@@ -51,7 +86,7 @@ describe('Output Handling', () => {
         }));
 
     it('should handle errors gracefully', () => throwError
-        .run({})
+        .test({})
         .then(data => {
             expect(data.statusCode).to.equal(500);
 
@@ -61,7 +96,7 @@ describe('Output Handling', () => {
         }));
 
     it('should check for required inputs properly', () => useParameters
-        .run({})
+        .test({})
         .then(data => {
             expect(data.statusCode).to.equal(500);
 
@@ -71,7 +106,7 @@ describe('Output Handling', () => {
         }));
 
     it('should call validator functions properly', () => useParameters
-        .run({ userId: "a" })
+        .test({ userId: "a" })
         .then(data => {
             expect(data.statusCode).to.equal(500);
 
@@ -81,7 +116,7 @@ describe('Output Handling', () => {
         }));
 
     it('should parse string JSON blocks', () => useParameters
-        .run(`{ "userId": "${validUserId}" }`)
+        .test(`{ "userId": "${validUserId}" }`)
         .then(data => {
             expect(data.statusCode).to.equal(200);
 
@@ -99,7 +134,7 @@ describe('Output Handling', () => {
         }));
 
     it('should parse query headers', () => headers
-        .run({ headers: { 'Authorization': 'Bearer XYZ' } })
+        .run({ headers: { Authorization: 'Bearer XYZ' } })
         .then(data => {
             expect(data.statusCode).to.equal(200);
 

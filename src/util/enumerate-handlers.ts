@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as glob from 'glob';
-import { Handler } from '..';
+import { LMHandler } from '..';
 
 /**
  * Enumerate the functions defined in a given subdirectory and returned a formatted dictionary of metadata for the
@@ -13,9 +13,7 @@ export function enumerateHandlers(subdir: string) {
     glob
         .sync(path.join(process.cwd(), subdir), { nodir: true })
         .map(file => {
-            const handler: Handler = require(file);
-
-            console.log('handler', handler);
+            const handler: LMHandler = require(file);
 
             functions[handler.name || ''] = {
                 // In serverless.com definitions, the "handler" is the entry file with the function name as the suffix.

@@ -1,6 +1,7 @@
-import { Handler, MetaContext } from '../src';
+import { LMHandler, LMContext, processRequest } from '../src';
 
-const handler: Handler = {
+const handler: LMHandler = {
+    entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
     name: 'customValidationError',
     description: 'Input validation with custom error messages.',
     inputs: {
@@ -12,7 +13,7 @@ const handler: Handler = {
         },
     },
 
-    async process(event: any, context: MetaContext) {
+    async process(event: any, context: LMContext) {
         return {
             environment: process.env.NODE_ENV || 'development',
         };

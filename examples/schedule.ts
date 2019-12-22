@@ -2,17 +2,15 @@ import { LMHandler, LMContext, processRequest } from '../src';
 
 const handler: LMHandler = {
     entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
-    name: 'simpleResult',
+    name: 'schedule',
+    description: 'Illustrates how to run a function on a schedule.',
     events: [{
-        http: {
-            path: 'simple-result',
-            method: 'get',
-            cors: true,
-        }
+        schedule: 'cron(*/5 * * * ? *)',
     }],
 
     async process(event: any, context: LMContext) {
-        return 'test';
+        console.log('I was called on a schedule.');
+        return true;
     },
 };
 
