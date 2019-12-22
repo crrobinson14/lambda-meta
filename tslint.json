@@ -1,5 +1,11 @@
 {
   "extends": "tslint:latest",
+  "linterOptions": {
+    "exclude": [
+      "bin",
+      "test"
+    ]
+  },
   "rules": {
     "no-console": false,
     "arrow-parens": false,
