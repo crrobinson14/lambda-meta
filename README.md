@@ -1,5 +1,9 @@
 # Lambda Meta Handlers
 
+*NOTE: Version 3.x includes several breaking changes! This package was rewritten with full TypeScript support, and I
+took the opportunity to address several shortcomings of the previous versions. If you are not ready to upgrade, use
+version 2.1.2 as the latest version of the last major release.*
+
 [![CircleCI](https://circleci.com/gh/crrobinson14/lambda-meta.svg?style=shield)](https://circleci.com/gh/crrobinson14/lambda-meta)
 [![codecov](https://codecov.io/gh/crrobinson14/lambda-meta/branch/master/graph/badge.svg)](https://codecov.io/gh/crrobinson14/lambda-meta)
 

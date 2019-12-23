@@ -1,4 +1,5 @@
-import { wrapHandler } from '../helpers';
+import { getContext, wrapHandler } from '../helpers';
+import { BadRequestError } from '../../src';
 
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
@@ -6,21 +7,33 @@ const dirtyChai = require('dirty-chai');
 chai.use(dirtyChai);
 const expect = chai.expect;
 
-const simpleResult = wrapHandler('simpleResult');
+const apiGateway = wrapHandler('apiGateway');
 const complexResult = wrapHandler('complexResult');
-const preprocessor = wrapHandler('preprocessor');
-const useParameters = wrapHandler('useParameters');
+const customOptions = wrapHandler('customOptions');
 const customValidationError = wrapHandler('customValidationError');
-const throwError = wrapHandler('throwError');
-const responseCode = wrapHandler('responseCode');
-const numericInput = wrapHandler('numericInput');
-const mergeNothing = wrapHandler('mergeNothing');
-const warmUp = wrapHandler('warmUp');
 const headers = wrapHandler('headers');
+const mergeNothing = wrapHandler('mergeNothing');
+const numericInput = wrapHandler('numericInput');
+const preprocessor = wrapHandler('preprocessor');
+const responseCode = wrapHandler('responseCode');
+const skipResponse = wrapHandler('skipResponse');
+const simpleResult = wrapHandler('simpleResult');
+const throwError = wrapHandler('throwError');
+const useParameters = wrapHandler('useParameters');
+const warmUp = wrapHandler('warmUp');
 
 const validUserId = '6576BCA5-946B-41AC-AC91-E4096E95E3CD';
 
 describe('Output Handling', () => {
+    it('should support API Gateway definitions within the event array', () => apiGateway
+        .test({})
+        .then((data: any) => {
+            // TODO: This is sort of a bogus test. "We" don't actually do anything with this block and we wouldn't
+            // know for sure it was wrong here unless we deployed and tested it that way. Check to see if we can route
+            // something through serverless-offline?
+            expect(data.statusCode).to.equal(200);
+        }));
+
     it('should return literal results directly', () => simpleResult
         .test({})
         .then((data: any) => {
@@ -186,9 +199,7 @@ describe('Output Handling', () => {
         }));
 
     it('should print custom validation errors', () => customValidationError
-        .test({
-            userId: '1234',
-        })
+        .test({ userId: '1234' })
         .then((data: any) => {
             expect(data.statusCode).to.equal(500);
 
@@ -201,6 +212,28 @@ describe('Output Handling', () => {
         .then((data: any) => {
             expect(data).to.equal('Lambda is warm!');
         }));
+
+    it('should tolerate warmUp handlers that don\'t include a callback', async () => {
+        // We're just making sure we don't throw
+        await warmUp.entry({ source: 'serverless-plugin-warmup' }, getContext('warmUp'), undefined);
+    });
+
+    it('should support custom timeout and memory size options', () => {
+        expect(customOptions.timeout).to.equal(30);
+        expect(customOptions.memorySize).to.equal(256);
+    });
+
+    it('should allow responses to be manually sent', async () => {
+        const shouldSucceed = await skipResponse.test({ throwError: false });
+        expect(shouldSucceed).to.equal('OK'); // Raw string returned with no other processing
+
+        try {
+            await skipResponse.test({ throwError: true });
+        } catch (e) {
+            expect(e instanceof BadRequestError).to.be.true();
+            expect(e.message).to.equal('You asked for it...');
+        }
+    });
 
     it('should call validator functions properly', () => warmUp
         .test({})

@@ -83,9 +83,22 @@ export async function parseParameters(handler: LMHandler, event: any, context: L
 }
 
 /** Wrapper for processing requests. */
-export async function processRequest(handler: LMHandler, event: any, inputContext: LMContext | any, callback: Function) {
+export async function processRequest(handler: LMHandler, event: any, inputContext: LMContext | any, callback: Function | any) {
     let context = inputContext;
     context.callbackWaitsForEmptyEventLoop = false;
+
+    // @see https://github.com/FidelLimited/serverless-plugin-warmup
+    if (event.source === 'serverless-plugin-warmup') {
+        logInfo('WarmUP Plugin - Lambda is warm!');
+
+        if (callback) {
+            return callback(null, 'Lambda is warm!');
+        } else {
+            // We should always have a callback because "warmup" calls don't have manual handlers, so they bypass
+            // that logic. This is just in case the developer calls us directly for some reason.
+            return null;
+        }
+    }
 
     /* istanbul ignore next */
     if (Object.prototype.toString.call(context) !== '[object Object]') {
@@ -101,20 +114,7 @@ export async function processRequest(handler: LMHandler, event: any, inputContex
         context.awsRequestId = uuid();
     }
 
-    logInfo(`${(handler.name || 'Unknown')}(): Processing request ${context.awsRequestId || ''}`);
-
-    // @see https://github.com/FidelLimited/serverless-plugin-warmup
-    if (event.source === 'serverless-plugin-warmup') {
-        logInfo('WarmUP Plugin - Lambda is warm!');
-
-        if (callback) {
-            return callback(null, 'Lambda is warm!');
-        } else {
-            // We should always have a callback because "warmup" calls don't have manual handlers, so they bypass
-            // that logic. This is just in case the developer calls us directly for some reason.
-            return null;
-        }
-    }
+    logInfo(`${handler.name}(): Processing request ${context.awsRequestId}`);
 
     try {
         await parseParameters(handler, event, context);
@@ -129,7 +129,11 @@ export async function processRequest(handler: LMHandler, event: any, inputContex
             respondWithSuccess(handler, result, callback);
         }
     } catch (e) {
+        /* istanbul ignore next */
         if (!handler.skipResponse) {
+            // This really can't happen because we could only have this if the called function throws and skipResponse
+            // is true. But in that case Lambda ignores the thrown error and just times out since the callback was
+            // never called. So we tolerate this, but ignore it for testing purposes.
             respondWithError(handler, e, callback);
         }
     }

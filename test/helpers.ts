@@ -2,7 +2,7 @@ import { LMHandler } from '../src';
 import { Context } from 'aws-lambda';
 import { uuid } from 'uuidv4';
 
-const getContext = (name: string): Context => ({
+export const getContext = (name: string): Context => ({
     getRemainingTimeInMillis: () => 5000,
     functionName: name,
     functionVersion: '1',

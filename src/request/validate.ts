@@ -20,7 +20,7 @@ export async function validateParameters(handler: LMHandler, event: any, context
         return obj;
     }, {});
 
-    const promises = Object.entries(inputs || {})
+    const promises = Object.entries(inputs)
         .map(async ([fieldName, input]: [string, InputField]) => {
             let param = allParams[fieldName];
 
