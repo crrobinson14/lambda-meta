@@ -215,7 +215,8 @@ describe('Output Handling', () => {
 
     it('should tolerate warmUp handlers that don\'t include a callback', async () => {
         // We're just making sure we don't throw
-        await warmUp.entry({ source: 'serverless-plugin-warmup' }, getContext('warmUp'), undefined);
+        await warmUp.entry({ source: 'serverless-plugin-warmup' }, getContext('warmUp'), () => {
+        });
     });
 
     it('should support custom timeout and memory size options', () => {

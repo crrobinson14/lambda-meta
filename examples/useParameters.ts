@@ -1,5 +1,9 @@
 import { LMHandler, LMContext, processRequest } from '../src';
 
+/**
+ * Illustrates some more options for input parameters and validation.
+ */
+
 const handler: LMHandler = {
     entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
     name: 'useParameters',

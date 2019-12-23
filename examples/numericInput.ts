@@ -1,5 +1,10 @@
 import { LMHandler, LMContext, processRequest } from '../src';
 
+/**
+ * Illustrates accepting a parameter of a specific type. Consult the excellent Type-Check module's documentation in
+ * [https://www.npmjs.com/package/type-check] for more options.
+ */
+
 const handler: LMHandler = {
     entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
     name: 'numericInput',

@@ -1,5 +1,10 @@
 import { LMHandler, LMContext, processRequest } from '../src';
 
+/**
+ * Ilustrates processing of incoming headers, made available on context.headers. These are particularly useful in
+ * authentication preprocessors.
+ */
+
 const handler: LMHandler = {
     entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
     name: 'headers',

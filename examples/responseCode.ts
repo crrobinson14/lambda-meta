@@ -1,5 +1,10 @@
 import { LMHandler, LMContext, processRequest } from '../src';
 
+/**
+ * Custom HTTP response codes may be provided with an appropriate field in the return result. Note that custom
+ * error types are also provided by Lambda Meta that set 4xx..5xx status codes automatically when thrown.
+ */
+
 const handler: LMHandler = {
     entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
     name: 'complexResult',

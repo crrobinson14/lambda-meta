@@ -1,5 +1,21 @@
 import { LMHandler, LMContext, processRequest } from '../src';
 
+/**
+ * This function includes a preprocessor. In this case the code is synchronous, but async operation is supported, making
+ * preprocessors an easy way to implement authentication, quota, and other checks.
+ *
+ * For a session handler, a common pattern would be to define that as a function in a lib shared by all functions, then
+ * import it into each one and just set `preprocess: requireValidUser` or similar.
+ *
+ * Note the reference to context. Context is shared by both preprocessor and processor, and has an option-ended type
+ * definition that allows new data to be added to it. It's a convenient place to store information meant to be passed
+ * from the preprocessor to the processor.
+ *
+ * If the preprocessor throws, processing will stop (process will not be called). This is again a convenience for
+ * authentication middleware. If authentication is required and not provided, just throw an error in preprocess. You do
+ * not need to check "is session is valid?" in the process function itself - execution won't arrive there unless it is.
+ */
+
 const handler: LMHandler = {
     entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
     name: 'preprocessor',

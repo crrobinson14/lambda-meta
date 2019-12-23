@@ -1,5 +1,9 @@
 import { LMHandler, LMContext, processRequest } from '../src';
 
+/**
+ * Illustrates a custom validator that also returns a custom error message. This error will be returned to the caller.
+ */
+
 const handler: LMHandler = {
     entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
     name: 'customValidationError',

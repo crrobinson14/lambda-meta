@@ -1,5 +1,14 @@
 import { LMHandler, LMContext, processRequest, BadRequestError } from '../src';
 
+/**
+ * Sometimes a module may need to bypass Lambda Meta's "smart" response processing, e.g. if the caller cannot handle
+ * JSON output. This can also be useful in some CDN and domain ownership checks where you are expected to return a
+ * simple string from a call.
+ *
+ * Note that this function is more complex than it needs to be as a usage example. It's serving dual-purpose here to
+ * show how to throw a custom error via the same path.
+ */
+
 const handler: LMHandler = {
     entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
     name: 'skipResponse',
