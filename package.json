@@ -26,10 +26,10 @@
     "test_circleX": "cross-env NODE_ENV=test node_modules/.bin/nyc mocha --reporter mocha-junit-reporter --reporter-options mochaFile=./junit.xml"
   },
   "nyc": {
-    "lines": 90,
-    "statements": 90,
-    "functions": 90,
-    "branches": 90,
+    "lines": 80,
+    "statements": 80,
+    "functions": 80,
+    "branches": 80,
     "include": [
       "src"
     ],

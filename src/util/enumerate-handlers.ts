@@ -20,6 +20,14 @@ export function enumerateHandlers(subdir: string) {
                 // So "myfile.entry" would mean "const handler = require(myfile); handler.entry(...);"
                 handler: path.relative('.', file).replace('.js', '.entry').replace('.ts', '.entry'),
                 events: handler.events || [],
+
+                // We do this manually because we don't want to copy all the methods, just those useful for docs
+                ...(handler.name ? { name: handler.name } : {}),
+                ...(handler.description ? { description: handler.description } : {}),
+                ...(handler.inputs ? { inputs: handler.inputs } : {}),
+                ...(handler.skipResponse ? { skipResponse: handler.skipResponse } : {}),
+                ...(handler.mergeResult ? { mergeResult: handler.mergeResult } : {}),
+                ...(handler.responseHeaders ? { responseHeaders: handler.responseHeaders } : {}),
                 ...(handler.timeout ? { timeout: handler.timeout } : {}),
                 ...(handler.memorySize ? { memorySize: handler.memorySize } : {}),
                 ...(handler.warmup ? { warmup: handler.warmup } : {}),

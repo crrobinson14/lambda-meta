@@ -1,5 +1,10 @@
 import { LMHandler, LMContext, processRequest } from '../src';
 
+/**
+ * This example illustrates returning a more complex result than `simpleResult`, an object. We also set `mergeResult`
+ * to true. This means instead of response.result.environment we will see response.environment returned.
+ */
+
 const handler: LMHandler = {
     entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
     name: 'complexResult',

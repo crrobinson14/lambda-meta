@@ -9,8 +9,8 @@ version 2.1.2 as the latest version of the last major release.*
 
 This project provides some simple, mildly-opinionated wrappers for AWS Lambda request processing. Specifically:
 
-1. Parsing parameters in Lambda requires manual work and attention to where the parameters are coming in (e.g. query
-string vs. body). Parameters are handled here as in most other frameworks: parameters may appear anywhere, and are
+1. Parsing parameters in Lambda requires a lot of manual, repetitive work, and attention paid to where the parameters
+are coming in (e.g. query string vs. body). For example, if you Parameters are handled here as in most other frameworks: parameters may appear anywhere, and are
 parsed with a priority order (e.g. body overrides query string).
 
 2. Input validation is provided via metadata defined in the methods. Simplified handlers to minimize the boilerplate

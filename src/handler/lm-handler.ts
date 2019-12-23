@@ -31,9 +31,6 @@ export abstract class LMHandler {
     /** Methods for triggering the function */
     events?: any[];
 
-    /** If set to true and an object is returned, its properties will be spread out to the top-level response object. */
-    expandResults?: boolean;
-
     /** Optional custom headers to be added to the response */
     responseHeaders?: {
         [header: string]: string,

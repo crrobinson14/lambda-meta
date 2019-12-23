@@ -8,7 +8,7 @@ const expect = chai.expect;
 
 describe('Function Enumeration', () => {
     it('should properly enumerate functions', () => {
-        const functions = enumerateHandlers('examples/*.ts');
+        const functions = enumerateHandlers('examples/*.@(js|ts)');
 
         expect(functions.simpleResult.events[0].http.path).to.equal('simple-result');
         expect(functions.simpleResult.events[0].http.method).to.equal('get');
@@ -17,5 +17,7 @@ describe('Function Enumeration', () => {
 
         expect(functions.customOptions.memorySize).to.equal(256);
         expect(functions.customOptions.timeout).to.equal(30);
+
+        expect(functions.es5Example.name).to.equal('es5Example');
     });
 });
