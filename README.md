@@ -23,7 +23,7 @@ refactoring (adding CORS support to a group of functions - get ready for a lot o
 not to miss one!) or even just double-checking a function's settings.
 
     Lambda Meta makes this job MUCH easier. Changing your `serverless.yml` to a `serverless.js` file allows you to
-    include custom logic in its generation. Lambda Meta provides a convenient `enumerateFunctions()` helper that
+    include custom logic in its generation. Lambda Meta provides a convenient `enumerateHandlers()` helper that
     scans a directory you specify, finds all the functions defined there, and, using metadata in each file, outputs
     a fully formatted `functions:` block to serverless.com! This is a huge time-saver and lets you immediately see
     a function's inputs, HTTP settings, and more all in a single file while editing it.
@@ -245,17 +245,17 @@ structure, adding `{ ... },` wrappers around indented blocks as necessary to con
 
 If you do this, you can omit the `functions` block and instead use Lambda Meta's helper in your `serverless.js`:
 
-    const { enumerateFunctions } = require('lambda-meta);
+    const { enumerateHandlers } = require('lambda-meta');
     
     module.exports = {
         service: 'xyz',
         app: 'myApp',
         // ... other serverless.com options as needed
     
-        functions: enumerateFunctions('functions/**/*.ts'),
+        functions: enumerateHandlers('functions/**/*.ts'),
         
-        // enumerateFunctions uses glob() so any valid glob syntax works. e.g. to find both TS and JS files:
-        // functions: enumerateFunctions('functions/**/*.@(js|ts)'),
+        // enumerateHandlers uses glob() so any valid glob syntax works. e.g. to find both TS and JS files:
+        // functions: enumerateHandlers('functions/**/*.@(js|ts)'),
     };
 
 ## Roadmap
