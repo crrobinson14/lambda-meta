@@ -23,10 +23,10 @@ refactoring (adding CORS support to a group of functions - get ready for a lot o
 not to miss one!) or even just double-checking a function's settings.
 
     Lambda Meta makes this job MUCH easier. Changing your `serverless.yml` to a `serverless.js` file allows you to
-    include custom logic in its generation. Lambda Meta provides a convenient `enumerateHandlers()` helper that
-    scans a directory you specify, finds all the functions defined there, and, using metadata in each file, outputs
-    a fully formatted `functions:` block to serverless.com! This is a huge time-saver and lets you immediately see
-    a function's inputs, HTTP settings, and more all in a single file while editing it.
+    include custom logic in its generation. Lambda Meta provides a convenient helper that scans a directory you specify,
+    finds all the functions defined there, and, using metadata in each file, outputs a fully formatted `functions:` 
+    block to Serverless! This is a huge time-saver and lets you immediately see a function's inputs, HTTP settings,
+    and more all in a single file while editing it.
 
 3. Output handling is standardized, and set both the HTTP status code and output format for each response.
 
@@ -243,10 +243,20 @@ file! This is poorly documented (but definitely supported) functionality that ha
 The options and format of this file are exactly the same as the YML structure. Just `module.exports = {` the same
 structure, adding `{ ... },` wrappers around indented blocks as necessary to convert the YML to JS.
 
-If you do this, you can omit the `functions` block and instead use Lambda Meta's helper in your `serverless.js`:
+Unfortunately, for the time being serverless does NOT directly read `serverless.ts` files. There is a plugin to read
+TypeScript handlers during a build, but not for the config file itself (thumb up and follow
+[this Github issue](https://github.com/serverless/serverless/issues/6335) for updates!) This means we cannot use the
+technique in Lambda Meta 2.x of providing an `enumerateHandlers()` function called directly inside the main config.
+Instead, we need a helper script to generate something more manageable.
 
-    const { enumerateHandlers } = require('lambda-meta');
+For now, a simple hack works. In your serverless.js file include the following module:
+
+    const child_process = require('child_process');
     
+    const enumerateHandlers = path => JSON.parse(child_process.execSync(`npx ts-node ./scripts/preprocess.ts "${path}"`));
+    
+Then when exporting your functions:
+
     module.exports = {
         service: 'xyz',
         app: 'myApp',

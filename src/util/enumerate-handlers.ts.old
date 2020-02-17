@@ -2,6 +2,8 @@ import * as path from 'path';
 import * as glob from 'glob';
 import { LMHandler } from '..';
 
+// NOTE: This facility is disabled until https://github.com/serverless/serverless/issues/6335 is resolved.
+
 /**
  * Enumerate the functions defined in a given subdirectory and returned a formatted dictionary of metadata for the
  * functions found. The format returned is suitable for exporting from a `serverless.js` file, but may be useful
@@ -12,8 +14,8 @@ export function enumerateHandlers(subdir: string) {
 
     glob
         .sync(path.join(process.cwd(), subdir), { nodir: true })
-        .map(file => {
-            const handler: LMHandler = require(file);
+        .map(async file => {
+            const handler: LMHandler = await import(file);
 
             functions[handler.name || ''] = {
                 // In serverless.com definitions, the "handler" is the entry file with the function name as the suffix.

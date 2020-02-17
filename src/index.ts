@@ -10,5 +10,8 @@ export * from './response/error';
 export * from './response/ok';
 export * from './response/response-processing';
 
-export * from './util/enumerate-handlers';
 export * from './util/log';
+
+// Disabling this until https://github.com/serverless/serverless/issues/6335 is resolved.
+// const { enumerateHandlers } = require('./util/enumerate-handlers');
+// export { enumerateHandlers };

@@ -1,5 +1,6 @@
 --require test/tsconfig.mocha.js
 --require source-map-support/register
 --recursive
+--timeout 10000
 
-test/**/*.spec.ts
+test/**/*.spec.*
