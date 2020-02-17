@@ -253,7 +253,8 @@ For now, a simple hack works. In your serverless.js file include the following m
 
     const child_process = require('child_process');
     
-    const enumerateHandlers = path => JSON.parse(child_process.execSync(`npx ts-node ./scripts/preprocess.ts "${path}"`));
+    const enumerateHandlers = path => 
+        JSON.parse(child_process.execSync(`npx ts-node ./scripts/preprocess.ts "${path}"`).toString('utf8'));
     
 Then when exporting your functions:
 

@@ -10,8 +10,10 @@ coverage
 examples
 .DS_Store
 .idea
-*.ts
 *.js.map
+.editorconfig
+.eslintrc.js
+tslint.json
 !*.d.ts
 src
 .idea/
