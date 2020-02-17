@@ -38,7 +38,7 @@ Usage is fairly simple. Install the module (`npm i -S lambda-meta`), then create
 
     const handler: LMHandler = {
         // The only boilerplate. Name must be unique!
-        entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
+        entry: (event, context, callback) => processRequest(handler, event, context, callback),
         name: 'myFunction',
         
         // Your processing function. See below for details, but TL;DR context.params will have your parameters.
@@ -47,15 +47,15 @@ Usage is fairly simple. Install the module (`npm i -S lambda-meta`), then create
         }
     };
     
-    module.exports = handler;
+    export default handler;
 
 ES5 is also supported:
 
     const { LMContext, processRequest } = require('lambda-meta');
 
-    module.exports = {
+    const handler = {
         // The only boilerplate. Name must be unique!
-        entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
+        entry: (event, context, callback) => processRequest(handler, event, context, callback),
         name: 'myFunction',
 
         // Your processing function. See below for details, but TL;DR context.params will have your parameters.
@@ -63,6 +63,8 @@ ES5 is also supported:
             return true;
         }
     };
+    
+    module.exports = handler;
     
 Lambda-Meta will take care of a number of request processing tasks for you, including parsing parameters from all
 possible methods (path, query, body, and even directly injected via `sls invoke` calls or other sources). LM's
@@ -72,7 +74,7 @@ behavior is controlled by setting additional options. A full list of all possibl
     
     const handler: LMHandler = {
         // Required boilerplate
-        entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
+        entry: (event, context, callback) => processRequest(handler, event, context, callback),
         
         // Required name and optional description. Useful for documentation purposes. Name must be unique or definitions
         // will be overwritten when they are loaded!
@@ -118,7 +120,7 @@ behavior is controlled by setting additional options. A full list of all possibl
         }
     };
     
-    module.exports = handler;
+    export default handler;
 
 This README would be very long if every option was described here. Usage examples for every option are included in the
 [Examples](https://github.com/crrobinson14/lambda-meta/tree/master/examples) folder. Please review them to get a sense
@@ -203,7 +205,7 @@ Trigger just set `skipResponse: true`, then make sure you call the callback func
     import { LMHandler, LMContext, processRequest } from 'lambda-meta';
 
     const handler: LMHandler = {
-        entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
+        entry: (event, context, callback) => processRequest(handler, event, context, callback),
         name: 'handleUserSignup',
         skipResponse: true,
         
@@ -213,7 +215,7 @@ Trigger just set `skipResponse: true`, then make sure you call the callback func
         }
     };
     
-    module.exports = handler;
+    export default handler;
 
 ## Error Handling
 
@@ -254,7 +256,7 @@ For now, a simple hack works. In your serverless.js file include the following m
     const child_process = require('child_process');
     
     const enumerateHandlers = path => 
-        JSON.parse(child_process.execSync(`npx ts-node ./scripts/preprocess.ts "${path}"`).toString('utf8'));
+        JSON.parse(child_process.execSync(`npx ts-node --skip-ignore ./scripts/preprocess.ts "${path}"`).toString('utf8'));
     
 Then when exporting your functions:
 

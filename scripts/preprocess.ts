@@ -12,7 +12,7 @@ export async function processHandlers(subdir: string) {
     const toProcess = glob
         .sync(path.join(process.cwd(), subdir), { nodir: true })
         .map(async file => {
-            const handler: any = await import(file);
+            const handler: any = (await import(file)).default;
 
             functions[handler.name || ''] = {
                 // In serverless.com definitions, the "handler" is the entry file with the function name as the suffix.

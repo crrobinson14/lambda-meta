@@ -5,7 +5,7 @@ import { LMHandler, LMContext, processRequest } from '../src';
  */
 
 const handler: LMHandler = {
-    entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
+    entry: (event, context, callback) => processRequest(handler, event, context, callback),
     name: 'simpleResult',
     events: [{
         http: {
@@ -20,4 +20,4 @@ const handler: LMHandler = {
     },
 };
 
-module.exports = handler;
+export default handler;

@@ -17,7 +17,7 @@ import { LMHandler, LMContext, processRequest } from '../src';
  */
 
 const handler: LMHandler = {
-    entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
+    entry: (event, context, callback) => processRequest(handler, event, context, callback),
     name: 'preprocessor',
     description: 'Example preprocessor usage.',
     inputs: {
@@ -51,4 +51,4 @@ const handler: LMHandler = {
     }
 };
 
-module.exports = handler;
+export default handler;

@@ -5,7 +5,7 @@ import { LMHandler, LMContext, processRequest } from '../src';
  */
 
 const handler: LMHandler = {
-    entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
+    entry: (event, context, callback) => processRequest(handler, event, context, callback),
     name: 'customOptions',
     description: 'Overrides some serverless.js global settings.',
     timeout: 30,
@@ -16,4 +16,4 @@ const handler: LMHandler = {
     },
 };
 
-module.exports = handler;
+export default handler;

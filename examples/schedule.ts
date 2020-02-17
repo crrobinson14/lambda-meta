@@ -14,7 +14,7 @@ import { LMHandler, LMContext, processRequest } from '../src';
  */
 
 const handler: LMHandler = {
-    entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
+    entry: (event, context, callback) => processRequest(handler, event, context, callback),
     name: 'schedule',
     description: 'Illustrates how to run a function on a schedule.',
     events: [{
@@ -27,4 +27,4 @@ const handler: LMHandler = {
     },
 };
 
-module.exports = handler;
+export default handler;

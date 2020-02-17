@@ -10,7 +10,7 @@ import { LMHandler, LMContext, processRequest, BadRequestError } from '../src';
  */
 
 const handler: LMHandler = {
-    entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
+    entry: (event, context, callback) => processRequest(handler, event, context, callback),
     name: 'skipResponse',
     skipResponse: true,
     inputs: {
@@ -30,4 +30,4 @@ const handler: LMHandler = {
     },
 };
 
-module.exports = handler;
+export default handler;

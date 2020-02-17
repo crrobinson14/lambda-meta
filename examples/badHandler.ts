@@ -3,4 +3,6 @@
  * It is not an example of anything useful.
  */
 
-module.exports = {};
+const handler = {};
+
+export default handler;

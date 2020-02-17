@@ -14,7 +14,7 @@ import { LMHandler, LMContext, processRequest } from '../src';
  */
 
 const handler: LMHandler = {
-    entry: (event, context, callback) => processRequest(module.exports, event, context, callback),
+    entry: (event, context, callback) => processRequest(handler, event, context, callback),
     name: 'warmUp',
     description: 'Sample method to illustrate the warmUp plugin.',
     warmup: true,
@@ -25,4 +25,4 @@ const handler: LMHandler = {
     },
 };
 
-module.exports = handler;
+export default handler;

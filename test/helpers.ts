@@ -21,7 +21,7 @@ export const getContext = (name: string): Context => ({
 });
 
 export function wrapHandler(name: string) {
-    const handler: LMHandler = require(`../examples/${name}`);
+    const handler: LMHandler = require(`../examples/${name}`).default;
 
     handler.test = (params: any) => new Promise((resolve, reject) => {
         handler.entry(params || {}, getContext(name), (err: any, result: any) => {
