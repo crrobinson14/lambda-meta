@@ -255,8 +255,11 @@ For now, a simple hack works. In your serverless.js file include the following m
 
     const child_process = require('child_process');
     
-    const enumerateHandlers = path => 
-        JSON.parse(child_process.execSync(`npx ts-node --skip-ignore ./scripts/preprocess.ts "${path}"`).toString('utf8'));
+    const enumerateHandlers = (path, namePrefix) => JSON.parse(
+      child_process
+        .execSync(`npx ts-node --skip-ignore ./node_modules/lambda-meta/scripts/preprocess.ts "${path}" "${namePrefix}"`)
+        .toString('utf8')
+    );
     
 Then when exporting your functions:
 
@@ -265,7 +268,9 @@ Then when exporting your functions:
         app: 'myApp',
         // ... other serverless.com options as needed
     
-        functions: enumerateHandlers('functions/**/*.ts'),
+        // Note the second parameter. This will instruct Lambda Meta to prefix all function names, e.g. listUsers will
+        // become 'xyz-prod-listUsers' assuming stage=prod.
+        functions: enumerateHandlers('functions/**/*.ts', `${service}-${stage}-`),
         
         // enumerateHandlers uses glob() so any valid glob syntax works. e.g. to find both TS and JS files:
         // functions: enumerateHandlers('functions/**/*.@(js|ts)'),

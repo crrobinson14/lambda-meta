@@ -6,7 +6,7 @@ import * as glob from 'glob';
  * functions found. The format returned is suitable for exporting from a `serverless.js` file, but may be useful
  * for other operations (e.g. documentation generation) as well.
  */
-export async function processHandlers(subdir: string) {
+export async function processHandlers(subdir: string, prefix: string = '') {
     const functions: any = {};
 
     const toProcess = glob
@@ -14,7 +14,7 @@ export async function processHandlers(subdir: string) {
         .map(async file => {
             const handler: any = (await import(file)).default;
 
-            functions[handler.name || ''] = {
+            functions[`${prefix}${handler.name || ''}`] = {
                 // In serverless.com definitions, the "handler" is the entry file with the function name as the suffix.
                 // So "myfile.entry" would mean "const handler = require(myfile); handler.entry(...);"
                 handler: path.relative('.', file).replace('.js', '.entry').replace('.ts', '.entry'),
@@ -37,7 +37,7 @@ export async function processHandlers(subdir: string) {
     return functions;
 }
 
-processHandlers(process.argv[2])
+processHandlers(process.argv[2], process.argv[3])
     .then(handlers => {
         console.log(JSON.stringify(handlers, null, 2));
         process.exit(0);
