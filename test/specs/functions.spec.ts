@@ -213,12 +213,6 @@ describe('Output Handling', () => {
             expect(data).to.equal('Lambda is warm!');
         }));
 
-    it('should tolerate warmUp handlers that don\'t include a callback', async () => {
-        // We're just making sure we don't throw
-        await warmUp.entry({ source: 'serverless-plugin-warmup' }, getContext('warmUp'), () => {
-        });
-    });
-
     it('should support custom timeout and memory size options', () => {
         expect(customOptions.timeout).to.equal(30);
         expect(customOptions.memorySize).to.equal(256);

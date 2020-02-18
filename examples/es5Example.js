@@ -5,7 +5,6 @@ const { processRequest } = require('../src');
  */
 
 const handler = {
-    entry: (event, context, callback) => processRequest(handler, event, context, callback),
     name: 'es5Example',
 
     async process(event, context) {
@@ -13,4 +12,7 @@ const handler = {
     },
 };
 
-module.exports = handler;
+module.exports = {
+    handler,
+    entry: (event, context, callback) => processRequest(handler, event, context, callback),
+};

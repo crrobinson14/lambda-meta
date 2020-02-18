@@ -12,12 +12,12 @@ export async function processHandlers(subdir: string, prefix: string = '') {
     const toProcess = glob
         .sync(path.join(process.cwd(), subdir), { nodir: true })
         .map(async file => {
-            const handler: any = (await import(file)).default;
+            const handler: any = (await import(file)).handler;
 
             functions[`${prefix}${handler.name || ''}`] = {
                 // In serverless.com definitions, the "handler" is the entry file with the function name as the suffix.
                 // So "myfile.entry" would mean "const handler = require(myfile); handler.entry(...);"
-                handler: path.relative('.', file).replace('.js', '.default.entry').replace('.ts', '.default.entry'),
+                handler: path.relative('.', file).replace('.js', '.entry').replace('.ts', '.entry'),
                 events: handler.events || [],
 
                 // We do this manually because we don't want to copy all the methods, just those useful for docs

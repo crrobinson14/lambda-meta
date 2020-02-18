@@ -6,8 +6,7 @@ import { LMHandler, LMContext, processRequest, TooManyRequestsError } from '../s
  * are just a convenience.
  */
 
-const handler: LMHandler = {
-    entry: (event, context, callback) => processRequest(handler, event, context, callback),
+export const handler: LMHandler = {
     name: 'throwError',
     description: 'Illustrates error handling.',
 
@@ -16,4 +15,4 @@ const handler: LMHandler = {
     },
 };
 
-export default handler;
+export const entry = (event: any, context: any, callback: any) => processRequest(handler, event, context, callback);

@@ -5,8 +5,7 @@ import { LMHandler, LMContext, processRequest } from '../src';
  * authentication preprocessors.
  */
 
-const handler: LMHandler = {
-    entry: (event, context, callback) => processRequest(handler, event, context, callback),
+export const handler: LMHandler = {
     name: 'headers',
     description: 'Sample method that echoes back headers.',
 
@@ -17,4 +16,4 @@ const handler: LMHandler = {
     }
 };
 
-export default handler;
+export const entry = (event: any, context: any, callback: any) => processRequest(handler, event, context, callback);

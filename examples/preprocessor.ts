@@ -16,8 +16,7 @@ import { LMHandler, LMContext, processRequest } from '../src';
  * not need to check "is session is valid?" in the process function itself - execution won't arrive there unless it is.
  */
 
-const handler: LMHandler = {
-    entry: (event, context, callback) => processRequest(handler, event, context, callback),
+export const handler: LMHandler = {
     name: 'preprocessor',
     description: 'Example preprocessor usage.',
     inputs: {
@@ -51,4 +50,4 @@ const handler: LMHandler = {
     }
 };
 
-export default handler;
+export const entry = (event: any, context: any, callback: any) => processRequest(handler, event, context, callback);

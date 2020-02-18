@@ -52,7 +52,7 @@ describe('Function Enumeration', () => {
             expect(functions['test-prefix-customOptions'].memorySize).to.equal(256);
             expect(functions['test-prefix-customOptions'].timeout).to.equal(30);
 
-            expect(functions['test-prefix-es5Example'].name).to.equal('test-prefix-es5Example');
+            expect(functions['test-prefix-es5Example'].name).to.equal('es5Example');
 
             done();
         });

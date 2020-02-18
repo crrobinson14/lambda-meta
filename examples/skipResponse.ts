@@ -9,8 +9,7 @@ import { LMHandler, LMContext, processRequest, BadRequestError } from '../src';
  * show how to throw a custom error via the same path.
  */
 
-const handler: LMHandler = {
-    entry: (event, context, callback) => processRequest(handler, event, context, callback),
+export const handler: LMHandler = {
     name: 'skipResponse',
     skipResponse: true,
     inputs: {
@@ -30,4 +29,4 @@ const handler: LMHandler = {
     },
 };
 
-export default handler;
+export const entry = (event: any, context: any, callback: any) => processRequest(handler, event, context, callback);

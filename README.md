@@ -36,9 +36,7 @@ Usage is fairly simple. Install the module (`npm i -S lambda-meta`), then create
 
     import { LMHandler, LMContext, processRequest } from 'lambda-meta';
 
-    const handler: LMHandler = {
-        // The only boilerplate. Name must be unique!
-        entry: (event, context, callback) => processRequest(handler, event, context, callback),
+    export const handler: LMHandler = {
         name: 'myFunction',
         
         // Your processing function. See below for details, but TL;DR context.params will have your parameters.
@@ -47,15 +45,13 @@ Usage is fairly simple. Install the module (`npm i -S lambda-meta`), then create
         }
     };
     
-    export default handler;
+    export const entry = (event: any, context: any, callback: any) => processRequest(handler, event, context, callback);
 
 ES5 is also supported:
 
     const { LMContext, processRequest } = require('lambda-meta');
 
     const handler = {
-        // The only boilerplate. Name must be unique!
-        entry: (event, context, callback) => processRequest(handler, event, context, callback),
         name: 'myFunction',
 
         // Your processing function. See below for details, but TL;DR context.params will have your parameters.
@@ -64,7 +60,10 @@ ES5 is also supported:
         }
     };
     
-    module.exports = handler;
+    module.exports = {
+        handler,
+        entry: (event, context, callback) => processRequest(handler, event, context, callback),
+    };
     
 Lambda-Meta will take care of a number of request processing tasks for you, including parsing parameters from all
 possible methods (path, query, body, and even directly injected via `sls invoke` calls or other sources). LM's
@@ -72,10 +71,7 @@ behavior is controlled by setting additional options. A full list of all possibl
     
     import { LMHandler, LMContext, processRequest } from 'lambda-meta';
     
-    const handler: LMHandler = {
-        // Required boilerplate
-        entry: (event, context, callback) => processRequest(handler, event, context, callback),
-        
+    export const handler: LMHandler = {
         // Required name and optional description. Useful for documentation purposes. Name must be unique or definitions
         // will be overwritten when they are loaded!
         name: 'allOptions',
@@ -120,7 +116,7 @@ behavior is controlled by setting additional options. A full list of all possibl
         }
     };
     
-    export default handler;
+    export const entry = (event: any, context: any, callback: any) => processRequest(handler, event, context, callback);
 
 This README would be very long if every option was described here. Usage examples for every option are included in the
 [Examples](https://github.com/crrobinson14/lambda-meta/tree/master/examples) folder. Please review them to get a sense
@@ -204,8 +200,7 @@ Trigger just set `skipResponse: true`, then make sure you call the callback func
   
     import { LMHandler, LMContext, processRequest } from 'lambda-meta';
 
-    const handler: LMHandler = {
-        entry: (event, context, callback) => processRequest(handler, event, context, callback),
+    export const handler: LMHandler = {
         name: 'handleUserSignup',
         skipResponse: true,
         
@@ -215,7 +210,7 @@ Trigger just set `skipResponse: true`, then make sure you call the callback func
         }
     };
     
-    export default handler;
+    export const entry = (event: any, context: any, callback: any) => processRequest(handler, event, context, callback);
 
 ## Error Handling
 
@@ -270,7 +265,7 @@ Then when exporting your functions:
     
         // Note the second parameter. This will instruct Lambda Meta to prefix all function names, e.g. listUsers will
         // become 'xyz-prod-listUsers' assuming stage=prod.
-        functions: enumerateHandlers('functions/**/*.ts', `${module.exports.service}-${stage}-`),
+        functions: enumerateHandlers('functions/**/*.ts', `my-api-${stage}-`),
         
         // enumerateHandlers uses glob() so any valid glob syntax works. e.g. to find both TS and JS files:
         // functions: enumerateHandlers('functions/**/*.@(js|ts)'),

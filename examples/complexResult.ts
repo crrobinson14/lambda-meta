@@ -5,8 +5,7 @@ import { LMHandler, LMContext, processRequest } from '../src';
  * to true. This means instead of response.result.environment we will see response.environment returned.
  */
 
-const handler: LMHandler = {
-    entry: (event, context, callback) => processRequest(handler, event, context, callback),
+export const handler: LMHandler = {
     name: 'complexResult',
     description: 'Sample method that uses no parameters and returns a complex object result.',
     mergeResult: true,
@@ -18,4 +17,4 @@ const handler: LMHandler = {
     }
 };
 
-export default handler;
+export const entry = (event: any, context: any, callback: any) => processRequest(handler, event, context, callback);

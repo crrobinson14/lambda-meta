@@ -5,8 +5,7 @@ import { LMHandler, LMContext, processRequest } from '../src';
  * error types are also provided by Lambda Meta that set 4xx..5xx status codes automatically when thrown.
  */
 
-const handler: LMHandler = {
-    entry: (event, context, callback) => processRequest(handler, event, context, callback),
+export const handler: LMHandler = {
     name: 'complexResult',
     description: 'Sample method that uses no parameters and returns a complex object result.',
 
@@ -18,4 +17,4 @@ const handler: LMHandler = {
     }
 };
 
-export default handler;
+export const entry = (event: any, context: any, callback: any) => processRequest(handler, event, context, callback);

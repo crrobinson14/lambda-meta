@@ -37,14 +37,6 @@ export abstract class LMHandler {
     };
 
     /* istanbul ignore next */
-    /**
-     * Required AWS Lambda entry callback. Should generally not be set by the developer - the RequestHandler decorator
-     * sets this automatically.
-     */
-    entry(event: any, context: Context, callback: Function): any {
-    }
-
-    /* istanbul ignore next */
     /** Optional pre-processing function for tasks like authentication checks. */
     async preprocess?(event: any, context: LMContext): Promise<any> {
     }

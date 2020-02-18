@@ -4,8 +4,7 @@ import { LMHandler, LMContext, processRequest } from '../src';
  * Illustrates some more options for input parameters and validation.
  */
 
-const handler: LMHandler = {
-    entry: (event, context, callback) => processRequest(handler, event, context, callback),
+export const handler: LMHandler = {
     name: 'useParameters',
     description: 'Sample method that requires a parameter, with input validation.',
     inputs: {
@@ -32,4 +31,4 @@ const handler: LMHandler = {
     },
 };
 
-export default handler;
+export const entry = (event: any, context: any, callback: any) => processRequest(handler, event, context, callback);
