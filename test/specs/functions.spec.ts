@@ -1,4 +1,4 @@
-import { getContext, wrapHandler } from '../helpers';
+import { wrapHandler } from '../helpers';
 import { BadRequestError } from '../../src';
 
 const chai = require('chai');
@@ -7,9 +7,7 @@ const dirtyChai = require('dirty-chai');
 chai.use(dirtyChai);
 const expect = chai.expect;
 
-const apiGateway = wrapHandler('apiGateway');
 const complexResult = wrapHandler('complexResult');
-const customOptions = wrapHandler('customOptions');
 const customValidationError = wrapHandler('customValidationError');
 const headers = wrapHandler('headers');
 const mergeNothing = wrapHandler('mergeNothing');
@@ -25,15 +23,6 @@ const warmUp = wrapHandler('warmUp');
 const validUserId = '6576BCA5-946B-41AC-AC91-E4096E95E3CD';
 
 describe('Output Handling', () => {
-    it('should support API Gateway definitions within the event array', () => apiGateway
-        .test({})
-        .then((data: any) => {
-            // TODO: This is sort of a bogus test. "We" don't actually do anything with this block and we wouldn't
-            // know for sure it was wrong here unless we deployed and tested it that way. Check to see if we can route
-            // something through serverless-offline?
-            expect(data.statusCode).to.equal(200);
-        }));
-
     it('should return literal results directly', () => simpleResult
         .test({})
         .then((data: any) => {
@@ -212,11 +201,6 @@ describe('Output Handling', () => {
         .then((data: any) => {
             expect(data).to.equal('Lambda is warm!');
         }));
-
-    it('should support custom timeout and memory size options', () => {
-        expect(customOptions.timeout).to.equal(30);
-        expect(customOptions.memorySize).to.equal(256);
-    });
 
     it('should allow responses to be manually sent', async () => {
         const shouldSucceed = await skipResponse.test({ throwError: false });

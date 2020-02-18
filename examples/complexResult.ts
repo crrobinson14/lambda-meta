@@ -6,8 +6,6 @@ import { LMHandler, LMContext, processRequest } from '../src';
  */
 
 export const handler: LMHandler = {
-    name: 'complexResult',
-    description: 'Sample method that uses no parameters and returns a complex object result.',
     mergeResult: true,
 
     async process(event: any, context: LMContext) {

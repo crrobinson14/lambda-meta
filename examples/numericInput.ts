@@ -6,8 +6,6 @@ import { LMHandler, LMContext, processRequest } from '../src';
  */
 
 export const handler: LMHandler = {
-    name: 'numericInput',
-    description: 'Sample method that requires numeric input.',
     inputs: {
         num: {
             required: true,

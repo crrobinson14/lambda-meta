@@ -10,7 +10,6 @@ import { LMHandler, LMContext, processRequest, BadRequestError } from '../src';
  */
 
 export const handler: LMHandler = {
-    name: 'skipResponse',
     skipResponse: true,
     inputs: {
         throwError: {

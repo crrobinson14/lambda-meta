@@ -17,8 +17,6 @@ import { LMHandler, LMContext, processRequest } from '../src';
  */
 
 export const handler: LMHandler = {
-    name: 'preprocessor',
-    description: 'Example preprocessor usage.',
     inputs: {
         userId: {
             required: true,

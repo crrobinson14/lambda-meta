@@ -5,8 +5,6 @@ import { LMHandler, LMContext, processRequest } from '../src';
  */
 
 export const handler: LMHandler = {
-    name: 'customValidationError',
-    description: 'Input validation with custom error messages.',
     inputs: {
         userId: {
             required: true,

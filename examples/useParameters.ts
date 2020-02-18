@@ -5,8 +5,6 @@ import { LMHandler, LMContext, processRequest } from '../src';
  */
 
 export const handler: LMHandler = {
-    name: 'useParameters',
-    description: 'Sample method that requires a parameter, with input validation.',
     inputs: {
         userId: {
             required: true,

@@ -5,15 +5,6 @@ import { LMHandler, LMContext, processRequest } from '../src';
  */
 
 export const handler: LMHandler = {
-    name: 'simpleResult',
-    events: [{
-        http: {
-            path: 'simple-result',
-            method: 'get',
-            cors: true,
-        }
-    }],
-
     async process(event: any, context: LMContext) {
         return 'test';
     },

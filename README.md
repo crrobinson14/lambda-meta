@@ -9,42 +9,41 @@ version 2.1.2 as the latest version of the last major release.*
 
 This project provides some simple, mildly-opinionated wrappers for AWS Lambda request processing. Specifically:
 
-1. Parsing parameters in Lambda requires a lot of manual, repetitive work, and attention paid to where the parameters
-are coming in (e.g. query string vs. body). For example, if you normally expect to parse a POST request via
-`JSON.parse(event.body)` you may be surprised at what happens if you call the function via `sls invoke`! In that case,
-(depending on how you call it) the data you pass may not need to be parsed and your call may fail! 
+1. Parsing parameters in Lambda requires a lot of manual, repetitive work, as well as attention to where the parameters
+are coming in. For example, if you normally expect to parse a POST request via `JSON.parse(event.body)` you may be
+surprised at what happens if you call the function via `sls invoke`! In that case, (depending on how you call it) the
+data you pass may not need to be parsed and your call may fail. 
 
     Lambda Meta handles these and a variety of other conditions to make your life easier.
 
-2. `serverless.com` is a great stack but it's common to find over time that your `serverless.yml` file gets quickly out
-of control and hard to manage. And as a YML file, syntax can be prickly - siomple indentation errors can break your
-entire stack in bad ways. Even worse, in an API with dozens of functions, it can be a real pain to do things like
-refactoring (adding CORS support to a group of functions - get ready for a lot of boilerplate pasting, and be careful
-not to miss one!) or even just double-checking a function's settings.
+2. Over time, `serverless.yml` file can grow out of control and be hard to maintain, particularly in the `functions`
+definitions. If your needs are complex, such as using tuning memory, timeout, and other settings per function, you may
+find that this file grows to hundreds of even thousands of lines long, and hard to visually "scan" for inconsistencies.
 
-    Lambda Meta makes this job MUCH easier. Changing your `serverless.yml` to a `serverless.js` file allows you to
-    include custom logic in its generation. Lambda Meta provides a convenient helper that scans a directory you specify,
-    finds all the functions defined there, and, using metadata in each file, outputs a fully formatted `functions:` 
-    block to Serverless! This is a huge time-saver and lets you immediately see a function's inputs, HTTP settings,
-    and more all in a single file while editing it.
+    Lambda Meta simplifies this job by moving operating parameters, input validation, API Gateway settings, and more
+    into documentation blocks within the function files themselves. These will feel very familiar to VueJS/React
+    developers because all of the logic and code related to a function is kept together in a single file.
 
-3. Output handling is standardized, and set both the HTTP status code and output format for each response.
+3. Output handling is also standardized. Lambda Meta will set HTTP status codes and output formats consistently for
+every function response, eliminating additional boilerplate from many handlers. If/where required, you can still take
+manual control over the output handling.
 
 ## Usage
 
-Usage is fairly simple. Install the module (`npm i -S lambda-meta`), then create each handler file with this template:
+Usage is fairly simple. Install the module (`npm i -S lambda-meta` or `yarn add lambda-meta`), then create each handler
+file with one of these templates:
 
     import { LMHandler, LMContext, processRequest } from 'lambda-meta';
 
     export const handler: LMHandler = {
-        name: 'myFunction',
-        
-        // Your processing function. See below for details, but TL;DR context.params will have your parameters.
+        // Your processing function. See below for details.
         async process(event: any, context: LMContext) {
+            console.log('Parameters received:', context.params);
             return true;
         }
     };
     
+    // Bind the standard AWS Lambda "entry point" to the additional request-processing "smarts" in Lambda-Meta.
     export const entry = (event: any, context: any, callback: any) => processRequest(handler, event, context, callback);
 
 ES5 is also supported:
@@ -52,8 +51,6 @@ ES5 is also supported:
     const { LMContext, processRequest } = require('lambda-meta');
 
     const handler = {
-        name: 'myFunction',
-
         // Your processing function. See below for details, but TL;DR context.params will have your parameters.
         async process(event: any, context: LMContext) {
             return true;
@@ -66,34 +63,19 @@ ES5 is also supported:
     };
     
 Lambda-Meta will take care of a number of request processing tasks for you, including parsing parameters from all
-possible methods (path, query, body, and even directly injected via `sls invoke` calls or other sources). LM's
-behavior is controlled by setting additional options. A full list of all possible options and their defaults is below:  
+possible methods (path, query, body, and even directly injected via `sls invoke` calls or other sources). A full list
+of all possible options and their defaults is below.
     
     import { LMHandler, LMContext, processRequest } from 'lambda-meta';
     
     export const handler: LMHandler = {
-        // Required name and optional description. Useful for documentation purposes. Name must be unique or definitions
-        // will be overwritten when they are loaded!
-        name: 'allOptions',
-        description: 'Sample method illustrating the use of all possible options',
-        
-        // Additional options.
-        timeout: 10000,
-        memorySize: 512,
-        warmup: true,
+        // By default, return results from process() are set as { result: { ...dataReturnedByProcess } }. If set true,
+        // and an object is returned, it will be merged at the root level of the result, e.g.
+        // { ...dataReturnedByProcess }
         mergeResult: true,
-        responseHeaders: {
-            'Cache-Control': 'max-age: 10',
-        },
-        events: [{
-            http: {
-                path: 'get/my/env',
-                method: 'get',
-                cors: true,
-            }
-        }, {
-            schedule: 'cron(*/5 * * * ? *)',
-        }],
+
+        // Inputs requiring validation. This is optional: if it is not provided, inputs will be simply parsed and passed
+        // to preprocess()/process() with no further evaluation.         
         inputs: {
             userId: {
                 required: true,
@@ -103,7 +85,8 @@ behavior is controlled by setting additional options. A full list of all possibl
             },
         },
             
-        // Optional request pre-processor
+        // Optional request pre-processor. May be used for common sync/async checks such as session validation. This is
+        // also a good place to check for required resources during cold-starts, such as database connections. 
         async preprocess(event: any, context: MetaContext) {
             context: 
         }
@@ -118,9 +101,8 @@ behavior is controlled by setting additional options. A full list of all possibl
     
     export const entry = (event: any, context: any, callback: any) => processRequest(handler, event, context, callback);
 
-This README would be very long if every option was described here. Usage examples for every option are included in the
-[Examples](https://github.com/crrobinson14/lambda-meta/tree/master/examples) folder. Please review them to get a sense
-of what is possible. Lambda Meta is very flexible! 
+Usage examples are included in the [Examples](https://github.com/crrobinson14/lambda-meta/tree/master/examples) folder.
+Please review them to get a sense of what is possible. Lambda Meta is very flexible! 
 
 ## Input Validation
 
@@ -227,55 +209,12 @@ to include in the error object (to be logged):
 
     throw new NotFoundError('Invalid Product Code');
 
-## Function Discovery and Enumeration
-
-Maintaining `serverless.yml` becomes a real drag as your API grows, with a lot of repeated boilerplatefor each of your
-functions. To streamline this maintenance chore, Lambda Meta can "discover" and list out your functions, using the 
-options you specify when defining them to tell Serverless how to treat them. Unfortunately, out of the box, this is
-unavoidable in Serverless because its configuration file is a static YML that can't include custom logic.
-
-But wait, you can! It turns out that you can provide your configuration in a `serverless.js` instead of the usual YML
-file! This is poorly documented (but definitely supported) functionality that has been available since 
-[Serverless Release v1.26.0](https://github.com/serverless/serverless/blob/master/CHANGELOG.md#1260-2018-01-29).
-The options and format of this file are exactly the same as the YML structure. Just `module.exports = {` the same
-structure, adding `{ ... },` wrappers around indented blocks as necessary to convert the YML to JS.
-
-Unfortunately, for the time being serverless does NOT directly read `serverless.ts` files. There is a plugin to read
-TypeScript handlers during a build, but not for the config file itself (thumb up and follow
-[this Github issue](https://github.com/serverless/serverless/issues/6335) for updates!) This means we cannot use the
-technique in Lambda Meta 2.x of providing an `enumerateHandlers()` function called directly inside the main config.
-Instead, we need a helper script to generate something more manageable.
-
-For now, a simple hack works. In your serverless.js file include the following module:
-
-    const child_process = require('child_process');
-    
-    const enumerateHandlers = (path, namePrefix) => JSON.parse(
-      child_process
-        .execSync(`npx ts-node --skip-ignore ./node_modules/lambda-meta/scripts/preprocess.ts "${path}" "${namePrefix}"`)
-        .toString('utf8')
-    );
-    
-Then when exporting your functions:
-
-    module.exports = {
-        service: 'xyz',
-        app: 'myApp',
-        // ... other serverless.com options as needed
-    
-        // Note the second parameter. This will instruct Lambda Meta to prefix all function names, e.g. listUsers will
-        // become 'xyz-prod-listUsers' assuming stage=prod.
-        functions: enumerateHandlers('functions/**/*.ts', `my-api-${stage}-`),
-        
-        // enumerateHandlers uses glob() so any valid glob syntax works. e.g. to find both TS and JS files:
-        // functions: enumerateHandlers('functions/**/*.@(js|ts)'),
-    };
-
 ## Roadmap
 
-This module depends on `type-check`, and `uuid`. At some point we will probably move these to be peer dependencies
-but the author's projects all required these modules anyway so this was left "simple" for now. Feel free
-to submit a PR to change this. :)
+* Adding TypeScript support created a huge headache for enumerating functions. I played with a number of different
+options for implementing this and every problem I resolved uncovered one more. For the time being I've disabled this
+functionality, but may revisit it in the future.
 
-I will also soon add support for outputting documentation blocks in 
-[Serverless.com OpenAPI Format](https://www.npmjs.com/package/serverless-openapi-documentation).
+* This module depends on `type-check`, and `uuid`. At some point we will probably move these to be peer dependencies
+but my projects all required these modules anyway so this was left "simple" for now. Feel free to submit a PR to 
+change this. :)

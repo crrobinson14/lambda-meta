@@ -7,7 +7,6 @@ import { LMHandler, LMContext, processRequest } from '../src';
  */
 
 export const handler: LMHandler = {
-    name: 'mergeNothing',
     mergeResult: true,
 
     async process(event: any, context: LMContext) {

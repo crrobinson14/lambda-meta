@@ -7,9 +7,6 @@ import { LMHandler, LMContext, processRequest, TooManyRequestsError } from '../s
  */
 
 export const handler: LMHandler = {
-    name: 'throwError',
-    description: 'Illustrates error handling.',
-
     async process(event: any, context: LMContext) {
         throw new TooManyRequestsError('Invalid XYZ.');
     },

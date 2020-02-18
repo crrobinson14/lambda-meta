@@ -6,9 +6,6 @@ import { LMHandler, LMContext, processRequest } from '../src';
  */
 
 export const handler: LMHandler = {
-    name: 'headers',
-    description: 'Sample method that echoes back headers.',
-
     async process(event: any, context: LMContext) {
         return {
             headers: context.headers,

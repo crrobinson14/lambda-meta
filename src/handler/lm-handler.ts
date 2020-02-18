@@ -2,13 +2,7 @@ import { Context } from 'aws-lambda';
 import { LMContext, InputField } from '..';
 
 export abstract class LMHandler {
-    /** Handler name, passed through to generated documentation */
-    name?: string;
-
-    /** Optional handler description, passed through to generated documentation */
-    description?: string;
-
-    /** Optional inputs. See [https://www.npmjs.com/package/type-check] for usage examples. */
+    /** Inputs requiring validation. See [https://www.npmjs.com/package/type-check] for usage examples. */
     inputs?: {
         [fieldName: string]: InputField,
     };
@@ -16,25 +10,8 @@ export abstract class LMHandler {
     /** If set to true, "standard" responses will not be emitted. The handler should emit its own. */
     skipResponse?: boolean;
 
-    /** If set to true, the serverless-plugin-warmup option will be emitted to enable warming up this function. */
-    warmup?: boolean;
-
-    /** Optional timeout specifically for the function. Overrides the global value. */
-    timeout?: number;
-
-    /** Optional memory size specifically for the function. Overrides the global value. */
-    memorySize?: number;
-
     /** Set to true to Object.assign() result objects to the root of the response object instead of response.result. */
     mergeResult?: boolean;
-
-    /** Methods for triggering the function */
-    events?: any[];
-
-    /** Optional custom headers to be added to the response */
-    responseHeaders?: {
-        [header: string]: string,
-    };
 
     /* istanbul ignore next */
     /** Optional pre-processing function for tasks like authentication checks. */
