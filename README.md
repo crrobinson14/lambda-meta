@@ -270,7 +270,7 @@ Then when exporting your functions:
     
         // Note the second parameter. This will instruct Lambda Meta to prefix all function names, e.g. listUsers will
         // become 'xyz-prod-listUsers' assuming stage=prod.
-        functions: enumerateHandlers('functions/**/*.ts', `${service}-${stage}-`),
+        functions: enumerateHandlers('functions/**/*.ts', `${module.exports.service}-${stage}-`),
         
         // enumerateHandlers uses glob() so any valid glob syntax works. e.g. to find both TS and JS files:
         // functions: enumerateHandlers('functions/**/*.@(js|ts)'),

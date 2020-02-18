@@ -43,7 +43,6 @@ describe('Function Enumeration', () => {
             }
 
             const functions = JSON.parse(stdout);
-            console.log('functions', functions);
 
             expect(functions['test-prefix-simpleResult'].events[0].http.path).to.equal('simple-result');
             expect(functions['test-prefix-simpleResult'].events[0].http.method).to.equal('get');
@@ -53,7 +52,7 @@ describe('Function Enumeration', () => {
             expect(functions['test-prefix-customOptions'].memorySize).to.equal(256);
             expect(functions['test-prefix-customOptions'].timeout).to.equal(30);
 
-            expect(functions['test-prefix-es5Example'].name).to.equal('es5Example');
+            expect(functions['test-prefix-es5Example'].name).to.equal('test-prefix-es5Example');
 
             done();
         });
